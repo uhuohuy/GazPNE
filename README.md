@@ -7,4 +7,6 @@ The Architecture of ZSL-PLT is as follows:
 
 ## Model Training
 The first step of ZSL-PLT is to train a model based on positive examples from gazetters and negative examples sythesized by rules.
-Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are choosed to select the osm name entitits from OSMNames. The Geoname data in the whole US and India area is used. 
+### Training examples perparation
+Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are choosed to select the osm name entitits from OSMNames (https://osmnames.org/download/). The Geoname data (https://download.geonames.org/export/dump/) in the whole US and India area is used. 
+
