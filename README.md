@@ -16,4 +16,6 @@ After got all the data, rawTextProcessing.py can be used to extract the positive
 We use three kinds of features in the classifier. The input layer concatenates all the features in a single vector. Specifically, the three types are two different word embeddings (i.e., generic and specific), and six handcrafted features. The generic word embedding is the pre-trained GloVe 50-Dimensional Word Vectors to capture generic language use. The second word embedding is employed to capture language use that is specific for each domain. We obtained that using the word2vector algorithm on the positive examples, with a dimension of 30, a minimum word frequency cutoff of 1, and a window size of 2.
 ### Model training
 We apply the C-LSTM  model in classifying the place entities, which combines the CNN and LSTM to achieve the best of both. In C-LSTM, CNN is first applied to extract higher-level sequences of word features. Then, LSTM is applied to capture long-term dependencies over window feature sequences, respectively. The topology of the network is depicted as follows:
+![Screenshot](figure/architecture.jpg)
+
 
