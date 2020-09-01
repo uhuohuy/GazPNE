@@ -5,8 +5,15 @@ This study proposes a zero-shot learning approach for place entity tagging from 
 The Architecture of ZSL-PLT is as follows:
 ![Screenshot](figure/workflow.jpg)
 
-## Model Training
+## Neural Classifier
 The first step of ZSL-PLT is to train a model based on positive examples from gazetters and negative examples sythesized by rules.
 ### Training examples perparation
 Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are choosed to select the osm name entitits from OSMNames (https://osmnames.org/download/). The Geoname data (https://download.geonames.org/export/dump/) in the whole US and India area is used. 
+Apart from gazetteers, word-embedding is used to extract general words, including goolge-embedding and Golve-embedding.
+Moreover, a file contains 5000 general words provided by lexical is also used.
+After got all the data, rawTextProcessing.py can be used to extract the positive examples and negative examples from the data file above.
+### Word embedding
+We use three kinds of features in the classifier. The input layer concatenates all the features in a single vector. Specifically, the three types are two different word embeddings (i.e., generic and specific), and six handcrafted features. The generic word embedding is the pre-trained GloVe 50-Dimensional Word Vectors to capture generic language use. The second word embedding is employed to capture language use that is specific for each domain. We obtained that using the word2vector algorithm on the positive examples, with a dimension of 30, a minimum word frequency cutoff of 1, and a window size of 2.
+### Model training
+We apply the C-LSTM  model in classifying the place entities, which combines the CNN and LSTM to achieve the best of both. In C-LSTM, CNN is first applied to extract higher-level sequences of word features. Then, LSTM is applied to capture long-term dependencies over window feature sequences, respectively. The topology of the network is depicted as follows:
 
