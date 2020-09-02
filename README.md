@@ -17,7 +17,8 @@ The Geoname data: Two files are IN.txt and US.txt, which can be downloaded throu
 Two word embeddings: Goolge-embedding and Golve-embedding.
 
 After got all the data, [rawTextProcessing.py](rawTextProcessing.py) can be used to extract the positive examples and negative examples from the data file above.
-The extracted positive and negative examples are shared through google drive.
+
+The extracted [positive) (https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Namx2XIxjkWIf/view?usp=sharing) and [negative] (https://drive.google.com/file/d/1KF5DEOwWq1D7QE9T-CLWy7X1fXJ9-x6S/view?usp=sharing) examples are shared through google drive.
 
 ### Specific Word embedding
 Specific Word embedding can be obtained by applying the word2vector algorithm on the positive examples. This can be done by [word2vec-garzeteer.py](word2vec-garzeteer.py).
@@ -32,8 +33,10 @@ We apply the C-LSTM  model in classifying the place entities, which combines the
 ## Place tagger from tweet texts
 The three tweet data sets are avaliable here and they should be put under the data folder. The trained model in the last step can be then used to extract the place from the tweet data set by [model_test_json.py](model_test_json.py).
 
+
 ## Experimental results
 
 ![Screenshot](figure/597627196.jpg)
 
-
+Apart from the gold data, we also have the raw tweet data but without annotation of the true place names, related to the 2018 Florance Hurricane. There are in total around 80,000 tweets.
+We apply the trained model also on this data set, and observe quite good test results.
