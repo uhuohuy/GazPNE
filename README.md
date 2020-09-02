@@ -8,14 +8,27 @@ The Architecture of ZSL-PLT is as follows:
 ## Neural Classifier
 The first step of ZSL-PLT is to train a model based on positive examples from gazetters and negative examples sythesized by rules.
 ### Training examples perparation
-Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are choosed to select the osm name entitits from OSMNames (https://osmnames.org/download/). The Geoname data (https://download.geonames.org/export/dump/) in the whole US and India area is used. 
-Apart from gazetteers, word-embedding is used to extract general words, including goolge-embedding and Golve-embedding.
-Moreover, a file contains 5000 general words provided by lexical is also used.
-After got all the data, [abc](rawTextProcessing.py) rawTextProcessing.py can be used to extract the positive examples and negative examples from the data file above.
-### Word embedding
-We use three kinds of features in the classifier. The input layer concatenates all the features in a single vector. Specifically, the three types are two different word embeddings (i.e., generic and specific), and six handcrafted features. The generic word embedding is the pre-trained GloVe 50-Dimensional Word Vectors to capture generic language use. The second word embedding is employed to capture language use that is specific for each domain. We obtained that using the word2vector algorithm on the positive examples, with a dimension of 30, a minimum word frequency cutoff of 1, and a window size of 2. In this step, word2vec-garzeteer.py is used to generate the specific word embeddings.
+Several important data are needed and should be put in the data folder.
+OSM data: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are choosed to select the osm name entitits from OSMNames (https://osmnames.org/download/). This file is too huge and shared through google drive.
+The Geoname data: Two files are IN.txt and US.txt, which can be downloaded through (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively.  
+Two word embeddings: Goolge-embedding and Golve-embedding.
+After got all the data, [rawTextProcessing.py](rawTextProcessing.py) can be used to extract the positive examples and negative examples from the data file above.
+The extracted positive and negative examples are shared through google drive.
+
+### Specific Word embedding
+Specific Word embedding can be obtained by applying the word2vector algorithm on the positive examples. This can be done by [word2vec-garzeteer.py](word2vec-garzeteer.py).
+We have provided the trained specific Word embedding on google drive. It should be put in the data folder
+
 ### Model training
 We apply the C-LSTM  model in classifying the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
 ![Screenshot](figure/architecture.jpg)
+[Garzetter_sim_pre.py](Garzetter_sim_pre.py) is used to train a classification model based on the positive and negative examples.
+
+## Place tagger from tweet texts
+The three tweet data sets are avaliable here and they should be put under the data folder. The trained model in the last step can be then used to extract the place from the tweet data set by [model_test_json.py](model_test_json.py).
+
+## Experimental results
+
+
 
 
