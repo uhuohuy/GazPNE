@@ -10,11 +10,11 @@ The first step of ZSL-PLT is to train a model based on positive examples from ga
 ### Training examples perparation
 Several important data are needed and should be put in the data folder.
 
-OSM data: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are choosed to select the osm name entitits from OSMNames (https://osmnames.org/download/). This file is too huge and shared through google drive.
+**OSM data**: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are choosed to select the osm name entitits from OSMNames (https://osmnames.org/download/). This file is too huge and shared through google drive.
 
-The Geoname data: Two files are IN.txt and US.txt, which can be downloaded through (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively.  
+**Geonames data**: Two files are IN.txt and US.txt, which can be downloaded through (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively.  
 
-Two word embeddings: Goolge-embedding and Golve-embedding.
+**Two word embeddings**: Goolge-embedding and Golve-embedding.
 
 After got all the data, [rawTextProcessing.py](rawTextProcessing.py) can be used to extract the positive examples and negative examples from the data file above.
 
