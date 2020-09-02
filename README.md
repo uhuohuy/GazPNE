@@ -29,6 +29,6 @@ The three tweet data sets are avaliable here and they should be put under the da
 
 ## Experimental results
 
-
+![Screenshot](figure/597627196.jpg)
 
 
