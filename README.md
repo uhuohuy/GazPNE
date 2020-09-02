@@ -23,7 +23,7 @@ The extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Nam
 ### Specific Word embedding
 Specific Word embedding can be obtained by applying the word2vector algorithm on the positive examples. This can be done by [word2vec-garzeteer.py](word2vec-garzeteer.py).
 
-We have also provided the trained specific Word embedding on google drive. It should be put in the data folder
+We have also provided the trained [specific Word embedding](https://drive.google.com/file/d/1xWl87ggoQIysydrXXqgRPr2rB4yzw8GU/view?usp=sharing) on google drive. It should be put in the data folder.
 
 ### Model training
 We apply the C-LSTM  model in classifying the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
