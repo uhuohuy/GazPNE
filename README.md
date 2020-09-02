@@ -9,15 +9,20 @@ The Architecture of ZSL-PLT is as follows:
 The first step of ZSL-PLT is to train a model based on positive examples from gazetters and negative examples sythesized by rules.
 ### Training examples perparation
 Several important data are needed and should be put in the data folder.
+
 OSM data: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are choosed to select the osm name entitits from OSMNames (https://osmnames.org/download/). This file is too huge and shared through google drive.
+
 The Geoname data: Two files are IN.txt and US.txt, which can be downloaded through (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively.  
+
 Two word embeddings: Goolge-embedding and Golve-embedding.
+
 After got all the data, [rawTextProcessing.py](rawTextProcessing.py) can be used to extract the positive examples and negative examples from the data file above.
 The extracted positive and negative examples are shared through google drive.
 
 ### Specific Word embedding
 Specific Word embedding can be obtained by applying the word2vector algorithm on the positive examples. This can be done by [word2vec-garzeteer.py](word2vec-garzeteer.py).
-We have provided the trained specific Word embedding on google drive. It should be put in the data folder
+
+We have also provided the trained specific Word embedding on google drive. It should be put in the data folder
 
 ### Model training
 We apply the C-LSTM  model in classifying the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
