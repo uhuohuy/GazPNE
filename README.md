@@ -24,7 +24,7 @@ After preparing all the data, [rawTextProcessing.py](rawTextProcessing.py) can b
 You coul aslo use our extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Namx2XIxjkWIf/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KF5DEOwWq1D7QE9T-CLWy7X1fXJ9-x6S/view?usp=sharing) examples directly.
 
 ### Specific Word embedding
-Specific Word embedding can be obtained by applying the word2vector algorithm on the positive examples. This can be done by [word2vec-garzeteer.py](word2vec-garzeteer.py).
+Specific word embedding can be obtained by applying the word2vector algorithm on the positive examples. This can be done by [word2vec-garzeteer.py](word2vec-garzeteer.py).
 
  > python word2vec-garzeteer.py --osmembed 2 --data 146
 
