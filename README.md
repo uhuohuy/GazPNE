@@ -21,7 +21,7 @@ After preparing all the data, [rawTextProcessing.py](rawTextProcessing.py) can b
  > python rawTextProcessing.py --osm usl --file 146 --ht 500 --lt 500 --ft 20 --unseen 1
 
 
-We also provided our extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Namx2XIxjkWIf/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KF5DEOwWq1D7QE9T-CLWy7X1fXJ9-x6S/view?usp=sharing) examples. They should be put in the ![data](data) folder.
+We also provided our extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Namx2XIxjkWIf/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KF5DEOwWq1D7QE9T-CLWy7X1fXJ9-x6S/view?usp=sharing) examples, named positive146.txt and negative146.txt, respectively. They should be put in the ![data](data) folder.
 
 ### Specific Word embedding
 Specific word embedding can be obtained by applying the word2vector algorithm on the positive examples. This can be done by [word2vec-garzeteer.py](word2vec-garzeteer.py).
