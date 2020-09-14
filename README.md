@@ -10,7 +10,7 @@ The first step of ZSL-PLT is to train a model based on positive examples from ga
 ### Training examples perparation
 Several important data are needed and should be put in the data folder.
 
-**OSM data**: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are choosed to select the osm name entitits from OSMNames (https://osmnames.org/download/). This file is too huge and shared through google drive.
+**OSM data**: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are chosen to select the osm name entitits from OSMNames (https://osmnames.org/download/). This file is too huge and thus shared through google drive.
 
 **Geonames data**: Two files are IN.txt and US.txt, which can be downloaded through (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively.  
 
@@ -26,6 +26,9 @@ The extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Nam
 ### Specific Word embedding
 Specific Word embedding can be obtained by applying the word2vector algorithm on the positive examples. This can be done by [word2vec-garzeteer.py](word2vec-garzeteer.py).
 
+ > python word2vec-garzeteer.py --osmembed 2 --data 146
+
+
 We have also provided the trained [specific Word embedding](https://drive.google.com/file/d/1xWl87ggoQIysydrXXqgRPr2rB4yzw8GU/view?usp=sharing) on google drive. It should be put in the data folder.
 
 ### Model training
@@ -33,8 +36,13 @@ We apply the C-LSTM  model in classifying the place entities, which combines the
 ![Screenshot](figure/architecture.jpg)
 [Garzetter_sim_pre.py](Garzetter_sim_pre.py) is used to train a classification model based on the positive and negative examples.
 
+ > python -u Garzetter_sim_pre.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l $split_l --oversample 1 --model 1 --embed 0 --atten_dim 120 --cnn_hid 120 --osm_char_emb 0 --under 150000000 --pos 0 --filter_option 1 --filter_l 1 --weight_loss 0 --max_cache 10 --osm_char_emb 0 --hc 1 --osm_word_emb 1 --postive 146 --negative 146 --osmembed 2 --preloadsize 3000000
+
 ## Place tagger from tweet texts
 The three tweet data sets are avaliable here and they should be put under the data folder. The trained model in the last step can be then used to extract the place from the tweet data set by [model_test_json.py](model_test_json.py).
+
+> python -u model_test_json.py --model_ID 0804173102 --atten_dim 120 --hidden 120 --filter_l 1 --epoch 0 --filter 1 --osm_char_emb 0 --bool_add_prob 1 --bool_remove 1 --added_prob 0.15 --bool_replace 0 --region 1 --model 7 --pos 0 --out 0 --osmembed 2 --thres 0.82 --bool_embed 0 --hard 0
+
 
 
 ## Experimental results
