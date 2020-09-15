@@ -45,12 +45,12 @@ We apply the C-LSTM  model in classifying the place entities, which combines the
 
  > python -u Garzetter_sim_pre.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --model 1 --embed 0 --atten_dim 120 --cnn_hid 120  --filter_option 1 --filter_l 1 --max_cache 10 --hc 1 --osm_word_emb 1 --postive 146 --negative 146 --osmembed 2 --preloadsize 3000000
 
-Parameter <*model*> denotes the type of model that will be trained. Two parameters <*postive*> and <*negative*> denote the ID of the file saving the positive examples and negative examples, respectively.
+Parameter <*model*> denotes the type of model that will be trained (CNN:0,Bi-LSTM:1, attention-CNN:2, clstm:3, attention-clstm:4). Two parameters <*postive*> and <*negative*> denote the ID of the file saving the positive examples and negative examples, respectively.
 
 After training, we can get a model named like 'clstm_model_0727135034epoch6.pkl', which is then manually rename as '0727135034epoch6.pkl'. 0727135034 is the date to create the model, and also used as the ID of the model. It will be used in the following step. The model trained after each epoch was kept. 
 
 ## Place name tagging from tweet texts
-The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are avaliable  and should be put in the ![data](data) folder. The trained model in the last step can be then used to extract the place from the tweet data set by [model_test_json.py](model_test_json.py).
+The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are avaliable and should be put in the ![data](data) folder. The trained model in the last step can be then used to extract the place from the tweet data set by [model_test_json.py](model_test_json.py).
 
 > python -u model_test_json.py --model_ID 0727135034 --atten_dim 120 --hidden 120 --filter_l 1 --epoch 6 --filter 1 --bool_remove 1  --region 1 --model 3 --osmembed 2 --thres 0.82 --bool_embed 0
 
