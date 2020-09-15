@@ -38,7 +38,7 @@ We apply the C-LSTM  model in classifying the place entities, which combines the
 
  > python -u Garzetter_sim_pre.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --oversample 1 --model 1 --embed 0 --atten_dim 120 --cnn_hid 120 --under 150000000 --pos 0 --filter_option 1 --filter_l 1 --weight_loss 0 --max_cache 10 --hc 1 --osm_word_emb 1 --postive 146 --negative 146 --osmembed 2 --preloadsize 3000000
 
-After training, we can get a model named like 'clstm_model_0727135034epoch6.pkl'. Then remove the name of model to '0727135034epoch6.pkl', while 0727135034 is the date to create the model, and also used as the ID of the model. It will be used in the following step. The model in each epoch was saved. 
+After training, we can get a model named like 'clstm_model_0727135034epoch6.pkl'. Then rename of model as '0727135034epoch6.pkl', while 0727135034 is the date to create the model, and also used as the ID of the model. It will be used in the following step. The model in each epoch was saved. 
 ## Place tagger from tweet texts
 The three tweet data sets are avaliable here and they should be put under the data folder. The trained model in the last step can be then used to extract the place from the tweet data set by [model_test_json.py](model_test_json.py).
 
