@@ -2,7 +2,7 @@
 ## Basic description
 This study proposes a zero-shot learning approach for place entity tagging from tweets, named ZSL-PLT, which does not assume any annotated sentences at training time. It fuses rule, gazetteer, and deep learning-based approaches to achieve the best performance among all. Specifically, we apply a Convolutional Neural Network (CNN) and Long Short-Term Memory (LSTM)-fused deep learning model called C-LSTM to derive a general place name classifier based on abundant positive examples (around 22 million) from gazetteers (i.e., OpenStreetMap and GeoNames) and negative examples (around 220 million) synthesized by rules. The classifier is then used to score n-gram segments of the tweet text and select the top none-overlapping candidates. We evaluate the approach on 4,500 disaster-related tweets, including around 9,500 place names from three targeted streams corresponding to the floods in Louisiana (the US), Houston (the US), and Chennai (India), respectively. We provide a comparison against several competitive baselines. The results show that the proposed approach improves the average F1-score from 0.81 for the best performing system to 0.87 (a 7\% increase).
 
-The Architecture of ZSL-PLT is as follows:
+The Architecture of GazPNE is as follows:
 ![Screenshot](figure/workflow.jpg)
 
 ## Neural Classifier
@@ -10,9 +10,17 @@ The first step of ZSL-PLT is to train a model based on positive examples from ga
 ### Training examples perparation
 Several important data are needed and should be put in the data folder.
 
-**OSM data**: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are chosen to select the osm name entitits from OSMNames (https://osmnames.org/download/). This file is too huge and thus shared through google drive.
+**OSM data**: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are chosen to select the osm items from OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the South US and Sount India, respectively. The extracted files are named usl.tsv and chennai.tsv, which should be put in the ![data](data) folder.
 
-**Geonames data**: Two files are IN.txt and US.txt, which can be downloaded through (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively.  
+**Geonames data**: Two files are IN.txt and US.txt, which can be downloaded via (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively. We only want partial entites from GeoNames, which are not sufficently provided by OSMNames due to technical issues. [geonames.py](geonames.py) can be used to extract the required place names from the two files, which are saved in the ![data](data) folder.
+
+ > python geonames.py --c IN
+ 
+ This will generate [in_geonames.txt](data/in_geonames.txt) 
+ 
+ > python geonames.py --c US
+
+This will generate [us_geonames.txt](data/us_geonames.txt) 
 
 **Two word embeddings**: Goolge-embedding and Golve-embedding.
 
