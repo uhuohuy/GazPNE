@@ -25,8 +25,9 @@ This will generate [us_geonames.txt](data/us_geonames.txt)
 
 After preparing all the data, [rawTextProcessing.py](rawTextProcessing.py) can be used to extract the positive examples and negative examples from the data file above. 
 
- > python rawTextProcessing.py --osm usl --file 146 --ht 500 --lt 500 --ft 20 --unseen 1
-
+ > python rawTextProcessing.py --file 146 --ht 500 --lt 500 --ft 20 --unseen 1
+ 
+Parameter <*file*> denotes the ID of the generated files saving positive and negative examples, named positive**ID**.txt and negative**ID**.txt
 
 We also provided our extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Namx2XIxjkWIf/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KF5DEOwWq1D7QE9T-CLWy7X1fXJ9-x6S/view?usp=sharing) examples, named positive146.txt and negative146.txt, respectively.
 
@@ -44,7 +45,7 @@ We apply the C-LSTM  model in classifying the place entities, which combines the
 
  > python -u Garzetter_sim_pre.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --model 1 --embed 0 --atten_dim 120 --cnn_hid 120  --filter_option 1 --filter_l 1 --max_cache 10 --hc 1 --osm_word_emb 1 --postive 146 --negative 146 --osmembed 2 --preloadsize 3000000
 
-Parameter *model* denotes the type of model that will be trained. Two parameters *postive* and *negative* denote the ID of the file saving the positive examples and negative examples, respectively.
+Parameter <*model*> denotes the type of model that will be trained. Two parameters <*postive*> and <*negative*> denote the ID of the file saving the positive examples and negative examples, respectively.
 
 After training, we can get a model named like 'clstm_model_0727135034epoch6.pkl', which is then manually rename as '0727135034epoch6.pkl'. 0727135034 is the date to create the model, and also used as the ID of the model. It will be used in the following step. The model trained after each epoch was kept. 
 
@@ -53,7 +54,7 @@ The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are a
 
 > python -u model_test_json.py --model_ID 0727135034 --atten_dim 120 --hidden 120 --filter_l 1 --epoch 6 --filter 1 --bool_remove 1  --region 1 --model 3 --osmembed 2 --thres 0.82 --bool_embed 0
 
-Two parameters *model_ID* and *epoch* are used to determine which model will be used. Parameter *model* denotes the type of used model (CNN:0,Bi-LSTM:1, attention-CNN:2, clstm:3, attention-clstm:4). Parameter *region* denotes the test data set (Lousiana:0, Houston:1, Chennai:2). 
+Two parameters <*model_ID*> and <*epoch*> are used to determine which model will be used. Parameter <*model*> denotes the type of used model (CNN:0,Bi-LSTM:1, attention-CNN:2, clstm:3, attention-clstm:4). Parameter <*region*> denotes the test data set (Lousiana:0, Houston:1, Chennai:2). 
 
 ## Experimental results
 
