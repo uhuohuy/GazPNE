@@ -37,9 +37,12 @@ Specific word embedding can be obtained by applying the word2vector algorithm on
  > python word2vec-garzeteer.py --osmembed 2 --data 146
 
 We have also provided the trained [specific Word embedding](https://drive.google.com/file/d/1xWl87ggoQIysydrXXqgRPr2rB4yzw8GU/view?usp=sharing). It should be put in the ![data](data) folder.
+Next, the file saved the negative examples are split into multiple smaller files with each containing 10 million lines (examples) since this can improve the loading effencicy of the negative examples.
 
+ > split -l 10000000 data/negative146.txt data/negative146
+ 
 ### Model training
-We apply the C-LSTM  model in classifying the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
+We apply the C-LSTM  model to classify the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
 ![Screenshot](figure/architecture.jpg)
 [Garzetter_sim_pre.py](Garzetter_sim_pre.py) is used to train a classification model based on the positive and negative examples.
 
