@@ -1,4 +1,4 @@
-# ZSL-PLT
+# Gaz-PNE
 ## Basic description
 This study proposes a zero-shot learning approach for place entity tagging from tweets, named ZSL-PLT, which does not assume any annotated sentences at training time. It fuses rule, gazetteer, and deep learning-based approaches to achieve the best performance among all. Specifically, we apply a Convolutional Neural Network (CNN) and Long Short-Term Memory (LSTM)-fused deep learning model called C-LSTM to derive a general place name classifier based on abundant positive examples (around 22 million) from gazetteers (i.e., OpenStreetMap and GeoNames) and negative examples (around 220 million) synthesized by rules. The classifier is then used to score n-gram segments of the tweet text and select the top none-overlapping candidates. We evaluate the approach on 4,500 disaster-related tweets, including around 9,500 place names from three targeted streams corresponding to the floods in Louisiana (the US), Houston (the US), and Chennai (India), respectively. We provide a comparison against several competitive baselines. The results show that the proposed approach improves the average F1-score from 0.81 for the best performing system to 0.87 (a 7\% increase).
 
@@ -8,12 +8,11 @@ The Architecture of GazPNE is as follows:
 ## Neural Classifier
 The first step of ZSL-PLT is to train a model based on positive examples from gazetters and negative examples sythesized by rules.
 ### Training examples perparation
-Several important data are needed and should be put in the data folder.
+Several important data need to be prepared before generating the negative and positive examples. All data should be put in the in the ![data](data) folder.
 
-**OSM data**: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are chosen to select the osm items from OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the South US and Sount India, respectively. The extracted files are named usl.tsv and chennai.tsv, which should be put in the ![data](data) folder.
+**OSM data**: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are chosen to select the osm items from OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the South US and Sount India, respectively. The extracted files are named usl.tsv and chennai.tsv.
 
-**Geonames data**: Two files are IN.txt and US.txt, which can be downloaded via (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively. We only want partial entites from GeoNames, which are not sufficently provided by OSMNames due to technical issues. [geonames.py](geonames.py) can be used to extract the required place names from the two files, which are saved in the ![data](data) folder.
-
+**Geonames data**: Two files are IN.txt and US.txt, which can be downloaded via (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively. We only want partial entites from GeoNames, which are not sufficently provided by OSMNames due to technical issues. [geonames.py](geonames.py) can be used to extract the required place names from the two files.
  > python geonames.py --c IN
  
  This will generate [in_geonames.txt](data/in_geonames.txt) 
@@ -29,15 +28,14 @@ After preparing all the data, [rawTextProcessing.py](rawTextProcessing.py) can b
  > python rawTextProcessing.py --osm usl --file 146 --ht 500 --lt 500 --ft 20 --unseen 1
 
 
-We also provided our extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Namx2XIxjkWIf/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KF5DEOwWq1D7QE9T-CLWy7X1fXJ9-x6S/view?usp=sharing) examples, named positive146.txt and negative146.txt, respectively. They should be put in the ![data](data) folder.
+We also provided our extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Namx2XIxjkWIf/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KF5DEOwWq1D7QE9T-CLWy7X1fXJ9-x6S/view?usp=sharing) examples, named positive146.txt and negative146.txt, respectively.
 
 ### Specific Word embedding
 Specific word embedding can be obtained by applying the word2vector algorithm on the positive examples. This can be done by [word2vec-garzeteer.py](word2vec-garzeteer.py).
 
  > python word2vec-garzeteer.py --osmembed 2 --data 146
 
-
-We have also provided the trained [specific Word embedding](https://drive.google.com/file/d/1xWl87ggoQIysydrXXqgRPr2rB4yzw8GU/view?usp=sharing) on google drive. It should be put in the ![data](data) folder.
+We have also provided the trained [specific Word embedding](https://drive.google.com/file/d/1xWl87ggoQIysydrXXqgRPr2rB4yzw8GU/view?usp=sharing). It should be put in the ![data](data) folder.
 
 ### Model training
 We apply the C-LSTM  model in classifying the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
