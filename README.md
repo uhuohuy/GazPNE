@@ -6,7 +6,7 @@ The Workflow of GazPNE is shown in the figure below.
 ![Screenshot](figure/workflow.jpg)
 
 ## 2.Model training
-The first step of GazPNE is to train a classification model based on positive examples from gazetters and negative examples sythesized by rules.
+The first step of GazPNE is to train a classification model based on positive examples from gazetteers and negative examples sythesized by rules.
 ### Training data perparation
 Several important data need to be prepared before generating the positive and negative examples. All data should be put in the ![data](data) folder.
 
