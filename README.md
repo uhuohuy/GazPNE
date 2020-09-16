@@ -71,6 +71,6 @@ Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parame
 
 ## 4.Experimental results
 
-![Screenshot](figure/597627196.jpg)
+![Screenshot](figure/result.jpg)
 
 Apart from the annotated gold data, we also test our approach on the one without annotation of the place names, corresponding to the 2018 Florance Hurricane. There are in total 80,000 tweets. Quite good predicition results have also been observed.
