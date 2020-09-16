@@ -44,7 +44,7 @@ Parameter <*osmembed*> denotes the ID of the specific word embedding and <*data*
 
 We provide the trained [specific Word embedding](https://drive.google.com/file/d/1xWl87ggoQIysydrXXqgRPr2rB4yzw8GU/view?usp=sharing). It should be put in the ![data](data) folder.
 
-Next, the file for the negative examples is split into multiple smaller files with each containing at most 10 million lines (examples) to improve the reading effencicy of the negative examples.
+Next, the file for the negative examples is split into multiple smaller files with each containing at most 10 million lines (examples) to improve the efficiency of reading the negative examples.
 
  > split -l 10000000 data/negative146.txt data/negative146
  
@@ -65,7 +65,7 @@ Users can also download our [trained model](https://drive.google.com/file/d/10To
 ## 3.Place name tagging from tweet texts
 The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are also provided and should be put in the ![data](data) folder. The trained model is then used to extract the place name from the tweet texts through [model_test_json.py](model_test_json.py).
 
-> python -u model_test_json.py --model_ID 0708233420 --atten_dim 120 --hidden 120 --filter_l 1 --epoch 1 --filter 1 --bool_remove 1  --region 1 --model 3 --osmembed 2 --thres 0.86 --bool_embed 0
+> python -u model_test_json.py --model_ID 0708233420 --atten_dim 120 --hidden 120 --filter_l 1 --epoch 0 --filter 1 --bool_remove 1  --region 1 --model 3 --osmembed 2 --thres 0.86 --bool_embed 0
 
 Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parameter <*model*> denotes the type of used model (CNN:0, Bi-LSTM:1, attention-CNN:2, clstm:3, attention-clstm:4). Parameter <*region*> denotes the test data set (Lousiana:0, Houston:1, Chennai:2). 
 
@@ -73,4 +73,4 @@ Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parame
 
 ![Screenshot](figure/597627196.jpg)
 
-Apart from the annotated gold data, we also test our approach on the raw tweet data but without annotation of the place names, corresponding to the 2018 Florance Hurricane. There are in total 80,000 tweets. Quite good predicition results have also been observed.
+Apart from the annotated gold data, we also test our approach on the one without annotation of the place names, corresponding to the 2018 Florance Hurricane. There are in total 80,000 tweets. Quite good predicition results have also been observed.
