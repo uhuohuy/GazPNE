@@ -641,7 +641,7 @@ if __name__ == '__main__':
     #google_word_index = 8000
     max_count = 1000000000
     gen_count = 18000000
-    choosen_dig_count = 10;10000;10
+    choosen_dig_count = 10;
     most_general_count = 240
     most_general_count_2 = 100
     most_general_words = []
@@ -1157,7 +1157,7 @@ if __name__ == '__main__':
     insert_negative_prefix_places = list(set(insert_negative_prefix_places).difference(set(aug_place_names)))
     insert_negative_prefix_places = copyACount(insert_negative_prefix_places, counter)
     inserted_neg.extend(insert_negative_prefix_places)
-    print('insert_negative_prefix_places count: ' + len(insert_negative_prefix_places))
+    print('insert_negative_prefix_places count: ' + str(len(insert_negative_prefix_places)))
         
 
     ''' extract the sub version of the positive examples as negative examples 
@@ -1168,7 +1168,7 @@ if __name__ == '__main__':
     short_negs = list(set(short_negs).difference(set(aug_place_names)))
     short_negs = copyACount(short_negs, counter)
     inserted_neg.extend(short_negs)
-    print('short_negs count: ' + len(short_negs))
+    print('short_negs count: ' + str(len(short_negs)))
     
     '''create the general list from the gazetteer, ascii, number-prefix words, numbers, and pre-embedding vocubularies'''
     #get the general words from gazetteer 
@@ -1215,7 +1215,7 @@ if __name__ == '__main__':
     counter=collections.Counter(neg_gens)
     neg_gens = copyACount(neg_gens, counter)
     inserted_neg.extend(neg_gens)
-    print('neg_gens count: ' + len(neg_gens))
+    print('neg_gens count: ' + str(len(neg_gens)))
 
     '''general words are treated as negative samples'''
     new_vocab_tuple = [(x,) for x in vocab_list]
@@ -1223,7 +1223,7 @@ if __name__ == '__main__':
     general_neg = list(set(new_vocab_tuple).difference(set(aug_place_names)))
     general_neg = copyACount(general_neg, counter)
     inserted_neg.extend(general_neg)
-    print('general_neg count: ' + len(general_neg))
+    print('general_neg count: ' + str(len(general_neg)))
 
     '''insert the most general words before the place category words to generate negative examples, 
     for instance, 'on the way' and 'at the street' will be generated'''
