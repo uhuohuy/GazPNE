@@ -10,7 +10,7 @@ The first step of GazPNE is to train a classification model based on positive ex
 ### Training data perparation
 Several important data need to be prepared before generating the positive and negative examples. All data should be put in the ![data](data) folder.
 
-**OSM data**: We first collect positive examples from OpenStreetMap. Specifically, two boundary boxes are chosen to extract the OSM items via OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the south US and sount India, respectively, as shown in the figure below. The extracted data are saved in usl.tsv and chennai.tsv, respectively. Since we extracted osm data from the two areas, the trained model is now applicable in the two areas. We will extend the model by extracting the osm data in the whole US and India areas in the future. 
+**OSM data**: We first collect positive examples from OpenStreetMap. Specifically, two boundary boxes are chosen to extract the OSM items via OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the south US and sount India, respectively, as shown in the figure below. The extracted data are saved in usl.tsv and chennai.tsv, respectively.
 <p float="left">
   <img src="figure/us.jpg" width="400" />
   <img src="figure/chennai.jpg" width="400" /> 
