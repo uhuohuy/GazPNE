@@ -227,8 +227,8 @@ def main():
     bool_mb_gaze = args.osm_word_emb
     model_ID = args.model_ID;
     gazetteer_emb_file = 'data/osm_vector'+str(args.osmembed)+'.txt'
-    bigram_file = 'data/'+model_ID+'-bigram.txt'
-    hcfeat_file = 'data/'+model_ID+'-hcfeat.txt'
+    bigram_file = 'model/'+model_ID+'-bigram.txt'
+    hcfeat_file = 'model/'+model_ID+'-hcfeat.txt'
     START_WORD = 'start_string_taghu'
     bigram_model = load_bigram_model(bigram_file)
 
@@ -238,7 +238,7 @@ def main():
         gazetteer_emb = []
         gaz_emb_dim = 0
     char_hc_emb,_ = load_embeding(hcfeat_file)
-    word_idx_file = 'data/'+model_ID+'vocab.txt'
+    word_idx_file = 'model/'+model_ID+'-vocab.txt'
     word2idx, max_char_len = load_word_index(word_idx_file)
     max_char_len = 20
     if args.bool_embed==1:

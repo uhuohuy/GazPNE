@@ -283,8 +283,8 @@ def main():
     lstm_layer_num = 1
     pos_f = 'data/positive'+str(args.postive)+'.txt'
     neg_f = 'data/negative'+str(args.negative)+'.txt' 
-    bigram_file = 'data/'+ time_str+'-bigram.txt'
-    hc_file = 'data/'+ time_str+'-hcfeat.txt'
+    bigram_file = 'model/'+ time_str+'-bigram.txt'
+    hc_file = 'model/'+ time_str+'-hcfeat.txt'
     PAD = 'paddxk'
     pad_index = 0
     max_char_len = 20
@@ -294,7 +294,7 @@ def main():
                           load_training_data_os(pos_f,neg_f,START_WORD, bigram_file, hc_file,PAD,pad_index,flex_feat_len,max_char_len,max_len,bool_hc,args.split_l)#
     pos_unit = args.split_l
     print('the number of unique words are:'+str(len(word_to_ix)))
-    vocab_file = 'data/'+ time_str+'vocab.txt'
+    vocab_file = 'model/'+ time_str+'-vocab.txt'
     with open(vocab_file, 'w+',encoding='utf-8') as f:
          for word in word_to_ix.keys():
              f.write(word+' '+str(word_to_ix[word])+'\n')
