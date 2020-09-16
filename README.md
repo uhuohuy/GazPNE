@@ -73,5 +73,4 @@ Two parameters <*model_ID*> and <*epoch*> are used to determine which model will
 
 ![Screenshot](figure/597627196.jpg)
 
-Apart from the gold data, we also have the raw tweet data but without annotation of the true place names, related to the 2018 Florance Hurricane. There are in total around 80,000 tweets.
-We apply the trained model also on this data set, and observe quite good test results.
+Apart from the annotated gold data, we also test our approach on the raw tweet data but without annotation of the place names, corresponding to the 2018 Florance Hurricane. There are in total 80,000 tweets. Quite good predicition results have also been observed.
