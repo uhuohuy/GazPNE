@@ -12,7 +12,7 @@ Modified by: Hussein S. Al-Olimat hussein@knoesis.org
 __author__="brendan o'connor (anyall.org)"
 
 import re
-from .emoticons import Emoticon
+from emoticons import Emoticon
 mycompile = lambda pat:  re.compile(pat,  re.UNICODE)
 def regex_or(*items):
   r = '|'.join(items)

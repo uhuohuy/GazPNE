@@ -1,6 +1,7 @@
 import re
 import codecs
 
+'''replace the number of a string by 0, such as hwy12 to hwy00'''
 def replace_digs(word):
     new_word = ''
     for i, c in enumerate(word):
@@ -9,10 +10,12 @@ def replace_digs(word):
         else:
             new_word+=c
     return new_word
-    
+'''to judege if a string contains numbers'''
+
 def hasNumbers(inputString):
     return bool(re.search(r'\d', inputString))
 
+'''write list of place names into file'''
 def write_place(file_name, place_names):
     f= codecs.open(file_name,"w+")
     for neg in place_names:
@@ -21,7 +24,8 @@ def write_place(file_name, place_names):
             temp = temp+negraw+' ' 
         f.write(temp+'\n')
     f.close()
-    
+
+'''load place names from a file'''    
 def load_osm_names_fre(pos_f, fre_words, aug_count = 1):
     pos_training_data = []
     with codecs.open(pos_f, 'r',encoding='utf-8') as file:
@@ -42,7 +46,9 @@ def load_osm_names_fre(pos_f, fre_words, aug_count = 1):
                 for k in range(aug_count):
                     pos_training_data.append(tuple(final_result)) 
     return pos_training_data
-    
+
+'''load place names from a file'''    
+
 def load_osm_names(pos_f):
     pos_training_data = []
     with codecs.open(pos_f, 'r',encoding='utf-8') as file:
@@ -56,6 +62,7 @@ def load_osm_names(pos_f):
 
 isascii = lambda s: len(s) == len(s.encode())
 
+'''split a word to multiple sub words by numbers'''    
 def split_numbers(word):
     groups = re.split('(\d+)',word)
     num_tag = False

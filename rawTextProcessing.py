@@ -4,30 +4,25 @@ import copy
 import codecs
 import random
 from random import randint
-from collections import defaultdict
 DIGIT_RE = re.compile(r"\d")
 import sys
 import collections
-from process_pos import get_variable_words
+#from process_pos import get_variable_words
 from utility import write_place, hasNumbers
 from gensim.models import KeyedVectors
 from utility import load_osm_names, isascii, split_numbers, replace_digs,load_osm_names_fre
-from Garzetter_adv import load_embeding
+from Garzetter_sim_pre import load_embeding
 import inflect
 import string
 import argparse
 
-string.ascii_lowercase
 
 engine = inflect.engine()
 print(sys.getdefaultencoding())
-def is_normal_word(word):
-    bool_n = True
-    for i in range(len(word)):
-        if i >= 1 and word[i].isupper():
-            bool_n = False
-            break
-    return bool_n
+'''For each ascill char in the lowercase, combine it with a number string ('0','00','000', '0000', and '00000')
+ to form a new negative example. <count> represents  the count of repetively producing new negative 
+examples each ascill char'''
+
 def ascii_num_neg(count):
     ascii_w = list(string.ascii_lowercase)
     new_neg = []
@@ -45,12 +40,17 @@ def ascii_num_neg(count):
                 new_test.append(cur_n_s)
                 new_neg.append(tuple(new_test))
     return new_neg
-def insert_last_word(place_names, last_word, count):
+
+
+'''randomly choose one place name from <place_names> if the last word of place name 
+is in <last_word> and one word from <last_word>. Insert the word at the end or begining of the place name
+ to form a new negative example. <max_count> denotes the maximum number of negative examples can be generated'''
+def insert_last_word(place_names, last_word, max_count):
     new_neg = []
     insert_len = [1]
     place_len = len(place_names)
     vocab_len = len(last_word)
-    for i in range(count):
+    for i in range(max_count):
         random_indexs_p = random.sample(range(place_len), 1)
         place = place_names[random_indexs_p[0]]
         while place[-1] not in last_word:
@@ -65,12 +65,15 @@ def insert_last_word(place_names, last_word, count):
             new_neg.append(tuple(new_list))
     return new_neg
 
-def get_neg_insert_random_gen(place_names, vocab_list, count): 
+'''randomly choose one place name from <place_names> and k (in <insert_len>) words from <vocabs>. Insert the k 
+words at random position of the place name to form a new negative example. <max_count> denotes the maximum 
+number of negative examples can be generated'''
+
+def get_neg_insert_random_gen(place_names, vocab_list, max_count, insert_len = [1,2]): 
     place_len = len(place_names)
     vocab_len = len(vocab_list)
     neg_pla = []
-    insert_len = [1,2]
-    count = int(count/len(insert_len))
+    count = int(max_count/len(insert_len))
     for i in range(count):
         for le in insert_len:
             random_indexs_p = random.sample(range(place_len), 1)
@@ -84,38 +87,17 @@ def get_neg_insert_random_gen(place_names, vocab_list, count):
                 neg_pla.append(tuple(new_list))
     return neg_pla
 
-def insert_preposition(place_names, prepositions, count):
-    needed_place_count = int(count / len(prepositions))
-    total_place_count = len(place_names)
-    neg_pla = []
-    for i in range(needed_place_count):
-        for pre in prepositions:
-            random_indexs_p = random.sample(range(total_place_count), 1)
-            new_list = []
-            new_list.append(pre)
-            new_list.extend(list(place_names[random_indexs_p[0]]))
-            neg_pla.append(tuple(new_list))
-    return neg_pla
+'''randomly choose two place names from <place_names> and k (in <insert_len>) words from <vocabs>. Insert the k 
+words between the two place names to form a new negative example. <max_count> denotes the maximum number of 
+negative examples can be generated'''
 
-def insert_preposition_last(place_names, prepositions, count):
-    needed_place_count = int(count / len(prepositions))
-    total_place_count = len(place_names)
-    neg_pla = []
-    for i in range(needed_place_count):
-        for pre in prepositions:
-            random_indexs_p = random.sample(range(total_place_count), 1)
-            new_list = []
-            new_list.extend(list(place_names[random_indexs_p[0]]))
-            new_list.append(pre)
-            neg_pla.append(tuple(new_list))
-    return neg_pla
 
-def combine_neg_gen(place_names, vocabs, count, insert_len = [1,2]):
+def combine_neg_gen(place_names, vocabs, max_count, insert_len = [1,2]):
     place_len = len(place_names)
     vocab_len = len(vocabs)
     neg_pla = []
     com_num = 2
-    count = int(count/len(insert_len))
+    count = int(max_count/len(insert_len))
     for i in range(count):
         for le in insert_len:
             random_indexs_p = random.sample(range(place_len), com_num)
@@ -128,11 +110,15 @@ def combine_neg_gen(place_names, vocabs, count, insert_len = [1,2]):
             neg_pla.append(tuple(new_list))
     return neg_pla
 
-def combine_neg(place_names, count):
+
+'''randomly choose 2 place names from <place_names> and combine them as a new negative example. <max_count> denotes 
+the maximum number of negative examples can be generated'''
+
+def combine_neg(place_names, max_count):
     place_len = len(place_names)
     neg_pla = []
     com_num = 2
-    for i in range(count):
+    for i in range(max_count):
         random_indexs = random.sample(range(place_len), com_num)
         temp_p = []
         for p in random_indexs:
@@ -140,11 +126,18 @@ def combine_neg(place_names, count):
         neg_pla.append(tuple(temp_p))
     return neg_pla
 
-def general_last_word(last_word, most_general, count):
+
+
+''' for each word in <last_word> named a and each word in <most_general> named b, combine a and b to 
+form a new negative example. The frequency (in <last_word_fre>) of a word in <last_word> determines the 
+count of repetively producing new negative examples from the word. <max_count> denotes the maximum number 
+of examples can be generated'''
+
+def general_last_word_adv(last_word, last_word_fre, most_general, max_count, gene_count = 4):
     return_places = []
-    gene_count = 4
     for word in last_word:
         for g in range(1, gene_count):
+            count = int(max_count*last_word_fre[word]/(gene_count-1))
             for i in range(count):
                 random_indexs = random.sample(range(len(most_general)), g+1)
                 gen_words = [most_general[j] for j in random_indexs]
@@ -152,17 +145,8 @@ def general_last_word(last_word, most_general, count):
                 return_places.append(tuple(gen_words))
     return return_places
 
-def general_last_word_adv(last_word, last_word_fre, most_general, total_count, gene_count = 4):
-    return_places = []
-    for word in last_word:
-        for g in range(1, gene_count):
-            count = int(total_count*last_word_fre[word]/(gene_count-1))
-            for i in range(count):
-                random_indexs = random.sample(range(len(most_general)), g+1)
-                gen_words = [most_general[j] for j in random_indexs]
-                gen_words.append(word)
-                return_places.append(tuple(gen_words))
-    return return_places
+''' for each word in <last_word> named a and each word in <most_general> named b, combine a and b to 
+form a new negative example. <count> represents the time of copying a new negative example'''
 
 def general_last_word2(last_word, most_general, count):
     return_places = []
@@ -191,22 +175,24 @@ def load_f_data(pos_f, very_fre_count):
                 very_fre_words.append(tokens[1])
     return pos_training_data,very_fre_words
 
-def general_words_neg_dig(words, count):
+'''randomly choose k (in <place_lens>) from <words>  and combine them as a new negative example. <max_count> denotes 
+the maximum number of examples can be generated'''
+
+def general_words_neg_dig(words, max_count, place_lens = [2,3,4]):
     neg_names = []
-    place_lens = [2,3,4]
-    ave_count = int(float(count) / len(place_lens))
+    ave_count = int(float(max_count) / len(place_lens))
     for l in place_lens:
         for i in range(ave_count):
             random_indexs = random.sample(range(1, len(words)-1), l)
-            #while words[random_indexs[-1]] in last_words and words[random_indexs[0]] in  first_words:
-             #   random_indexs = random.sample(range(1, len(words)-1), l)
             neg_names.append(tuple([words[idx] for idx in random_indexs]))
     return neg_names
 
-def general_words_neg(words, count, last_words, first_words, very_general_words):
+'''randomly choose k (in <place_lens>) words from <words> and combine them as a new negative example if it satisifies 
+several rules, invloving <last_words>, <first_words>, and <very_general_words>. <max_count> denotes 
+the maximum number of examples can be generated'''
+def general_words_neg(words, max_count, last_words, first_words, very_general_words, place_lens = [2,3,4,5,6]):
     neg_names = []
-    place_lens = [2,3,4,5,6]
-    ave_count = int(float(count) / len(place_lens))
+    ave_count = int(float(max_count) / len(place_lens))
     for l in place_lens:
         for i in range(ave_count):
             random_indexs = random.sample(range(1, len(words)-1), l)
@@ -215,7 +201,10 @@ def general_words_neg(words, count, last_words, first_words, very_general_words)
             neg_names.append(tuple([words[idx] for idx in random_indexs]))
     return neg_names
 
-def short_neg(place_names, last_word_set, fist_word_set):
+'''for each name in <place_names>, get the sub set of this name if 
+its last word is not in <last_word_set>'''
+
+def short_neg(place_names, last_word_set):
     neg_vocab = []#
     sing_neg_words = []
     for place in place_names:
@@ -229,14 +218,14 @@ def short_neg(place_names, last_word_set, fist_word_set):
                         sing_neg_words.append(temp_p)
     return neg_vocab,sing_neg_words
 
-def negative_prefix_num(negative_prex, count, attention_list):
+'''for each word in <negative_prex>, combine it with numbers ('0','00','000', '0000', and '00000') 
+to form a new negative example. <count> represents  the count of repetively producing new negative 
+examples from a word in <negative_prex>'''
+
+def negative_prefix_num(negative_prex, count):
     negative_places = []
     for prex in negative_prex:
-        if prex in attention_list:
-            mul_count = count*20
-        else:
-            mul_count = count
-        for i in range(mul_count):
+        for i in range(count):
             index_e = randint(1, 6)
             negative_places.append(tuple(['0'*index_e+prex[0]]))
             negative_places.append(tuple([prex[0]+'0'*index_e]))
@@ -252,53 +241,11 @@ def negative_prefix_num(negative_prex, count, attention_list):
             negative_places.append(tuple(temp_p1))
     return negative_places
 
-def uniq(lst):
-    last = object()
-    for item in lst:
-        if item == last:
-            continue
-        yield item
-        last = item
 
-def sort_and_deduplicate(l):
-    return list(uniq(sorted(l, reverse=True)))
 
-def get_general_words(train_path):
-    vocab_list = []
-    vocab_count = {}
-    with open(train_path, 'r') as file:
-        for line in file:
-            line = line.strip()
-            if len(line) == 0:
-                continue
-            tokens = line.split(' ')
-            if tokens[4] != 'B-LOC':
-                word = DIGIT_RE.sub("0", tokens[1])
-                new_word = ''.join(e for e in word if e.isalnum())
-                new_word = ''.join([i for i in new_word if not i.isdigit()])
-                if new_word:
-                    vocab_list.append(replace_digs(new_word.lower()))
-                    if tuple(new_word) in vocab_count.keys():
-                        vocab_count[tuple(new_word)] += 1
-                    else:
-                        vocab_count[tuple(new_word)] = 1
-    return vocab_list, vocab_count
-
-def get_neg_insert_meas(place_names, vocab_list, count=1, pair = 2):
-    new_neg = []
-    vocab_len = len(vocab_list)
-    for place in place_names:
-        for c in range(count):
-            for i in range(0,pair):
-                new_list = list(copy.deepcopy(place))
-                for j in range(0,i+1):
-                    index_s = randint(0, vocab_len-1)
-                    index_e = randint(0, vocab_len-1)
-                    new_list.insert(0, vocab_list[index_s])
-                    new_list.append(vocab_list[index_e])
-                new_list = tuple(new_list)
-                new_neg.append(new_list)
-    return new_neg
+'''randomly choose at most <pair> paris of  words from <vocab_list> and insert them in the begining and end 
+of a positive name from <place_names> respectively. <count> represents 
+ the count of repetively producing new negative examples from a place name in <place_names>'''
 
 def get_neg_insert(place_names, vocab_list, before_num_words, last_word_set, first_word_set, count=1, pair = 2):
     new_neg = []
@@ -318,9 +265,13 @@ def get_neg_insert(place_names, vocab_list, before_num_words, last_word_set, fir
                 new_neg.append(new_list)
     return new_neg
 
-def get_neg_insert_last(place_names, vocab_list, last_word_set, count=5):
+'''randomly choose k (in <insert_len>) words from <vocab_list> and insert them in the end 
+of a positive name from <place_names> if the last word of the positive name is in <last_word_set>. <count> represents 
+ the count of repetively producing new negative examples from a place name in <place_names>'''
+
+def get_neg_insert_last(place_names, vocab_list, last_word_set, count=5, insert_len = [1,2,3]):
     new_neg = []
-    insert_len = [1,2,3]
+
     vocab_len = len(vocab_list)
     for place in place_names:
         if place[-1] in last_word_set:
@@ -335,9 +286,15 @@ def get_neg_insert_last(place_names, vocab_list, last_word_set, count=5):
 
 #insert a couple of general words in the beginning of a place entities to generate negative 
 # examples if the inersted word is not in the preposition_list ['at','in','on','to']
-def get_neg_insert_first(place_names, vocab_list, preposition_list, count=10):
+    
+
+'''randomly choose k (in <insert_len>) words from <vocab_list> and insert them in the beginning 
+of a positive name from <place_names> . <count> represents 
+ the count of repetively producing new negative examples from a place name in <place_names>'''
+
+
+def get_neg_insert_first(place_names, vocab_list, preposition_list, count=10, insert_len = [1,2,3]):
     new_neg = []
-    insert_len = [1,2,3]
     vocab_len = len(vocab_list)
     for place in place_names:
         for c in range(count):
@@ -351,52 +308,30 @@ def get_neg_insert_first(place_names, vocab_list, preposition_list, count=10):
                 new_neg.append(tuple(new_list))
     return new_neg
 
-def get_neg_insert_first_old(place_names, vocab_list, preposition_list, more_general_words, pos_count, count=5):
-    new_neg = []
-    insert_len = [1,2,3]
-    vocab_len = len(vocab_list)
-    pos_count_in = 1
-    pre_pos_result = []
-    for place in place_names:
-        bool_tag = 0
-        for c in range(count):
-            for le in insert_len:
-                random_indexs = random.sample(range(vocab_len), le)
-                while le==1 and vocab_list[random_indexs[0]] in preposition_list:
-                    random_indexs = random.sample(range(vocab_len), le)                    
-                new_list = list(copy.deepcopy(place))
-                for index_l in random_indexs:
-                    new_list.insert(0,vocab_list[index_l])
-                if le == 1 and bool_tag==0 and vocab_list[random_indexs[0]] not in more_general_words and pos_count_in < pos_count:
-                    new_pos_list = copy.deepcopy(new_list)
-                    random_indexs_pre = random.sample(range(len(preposition_list)), 1) 
-                    new_pos_list.insert(0, preposition_list[random_indexs_pre[0]])
-                    pre_pos_result.append(tuple(new_pos_list))
-                    pos_count_in += 1
-                    bool_tag = 1
-                new_neg.append(tuple(new_list))
-    return new_neg, pre_pos_result
 
+#def get_neg_insert_last_num(place_names, vocab_list, last_num_word_set, max_count):
+#    new_neg = []
+#    insert_len = [1,2]
+#    vocab_len = len(vocab_list)
+#    count = 0
+#    for place in place_names:
+#        if count < max_count and place[-1] not in last_num_word_set:
+#            for le in insert_len:
+#                random_indexs = random.sample(range(vocab_len), le)
+#                new_list = list(copy.deepcopy(place))
+#                for index_l in random_indexs:
+#                    new_list.append(vocab_list[index_l])
+#                new_neg.append(tuple(new_list))
+#                count += 1
+#    return new_neg
 
-def get_neg_insert_last_num(place_names, vocab_list, last_num_word_set, max_count):
-    new_neg = []
-    insert_len = [1,2]
-    vocab_len = len(vocab_list)
-    count = 0
-    for place in place_names:
-        if count < max_count and place[-1] not in last_num_word_set:
-            for le in insert_len:
-                random_indexs = random.sample(range(vocab_len), le)
-                new_list = list(copy.deepcopy(place))
-                for index_l in random_indexs:
-                    new_list.append(vocab_list[index_l])
-                new_neg.append(tuple(new_list))
-                count += 1
-    return new_neg
+'''randomly choose k (in <insert_len>) words from <vocab_list> and insert them in the end 
+of a positive name from <place_names> if the last word of the positive 
+name is not in <last_alpha_word_set>. <max_count> denotes the maximum number 
+of examples can be generated'''
 
-def get_neg_insert_alpha(place_names, vocab_list, last_alpha_word_set, max_count):
+def get_neg_insert_alpha(place_names, vocab_list, last_alpha_word_set, max_count, insert_len = [1,2]):
     new_neg = []
-    insert_len = [1,2]
     vocab_len = len(vocab_list)
     count = 0
     for place in place_names:
@@ -410,9 +345,14 @@ def get_neg_insert_alpha(place_names, vocab_list, last_alpha_word_set, max_count
                 count += 1
     return new_neg
 
-def get_neg_insert_alpha_gen(place_names, vocab_list, last_alpha_word_set, max_count):
+
+'''randomly choose k (in <insert_len>) words from <vocab_list> and insert them in the end 
+of a positive name from <place_names> if the last word of the positive 
+name is not in <last_alpha_word_set>. <max_count> denotes the maximum number 
+of examples can be generated'''
+
+def get_neg_insert_alpha_gen(place_names, vocab_list, last_alpha_word_set, max_count, insert_len = [1,2]):
     new_neg = []
-    insert_len = [1,2]
     vocab_len = len(vocab_list)
     count = 0
     pl_len = len(place_names)
@@ -431,10 +371,13 @@ def get_neg_insert_alpha_gen(place_names, vocab_list, last_alpha_word_set, max_c
             count += 1
     return new_neg
 
+'''randomly choose k (in <insert_len>) words from <vocab_list> and insert them in the begining 
+of a positive name from <place_names> if the first word of the positive 
+name is not in <first_num_word_set>. <max_count> denotes the maximum number 
+of examples can be generated'''
 
-def get_neg_insert_first_num(place_names, vocab_list, first_num_word_set, max_count):
+def get_neg_insert_first_num(place_names, vocab_list, first_num_word_set, max_count, insert_len = [1,2]):
     new_neg = []
-    insert_len = [1,2]
     vocab_len = len(vocab_list)
     count = 0
     for place in place_names:
@@ -448,7 +391,9 @@ def get_neg_insert_first_num(place_names, vocab_list, first_num_word_set, max_co
                 count += 1
     return new_neg
 
-
+'''randomly choose a word from <prex_num> and insert it in the begining 
+and end of a positive name from <place_names>.
+ <max_count> denotes the maximum number of examples can be generated'''
 def get_neg_insert_prex_num(place_names, prex_num, max_count):
     new_neg = []
     vocab_len = len(prex_num)
@@ -471,6 +416,9 @@ def get_neg_insert_prex_num(place_names, prex_num, max_count):
             count += 1
     return new_neg
 
+'''randomly choose 1 to <insert_word_len> words from <vocab> and insert them 
+in the beginning and end of a place name from <place_names>. <count> represents 
+the count of repetively producing a new negative example from a place name in <place_names>'''
 def get_neg_insert_prex_gen(place_names, vocab, count=3, insert_word_len=2):
     new_neg = []
     vocab_len = len(vocab)
@@ -480,8 +428,6 @@ def get_neg_insert_prex_gen(place_names, vocab, count=3, insert_word_len=2):
                 new_list = []
                 for j in range(0,i+1):
                     index_s = randint(0, vocab_len-1)
-                    #while not vocab_list[index_s].isalnum():
-                    #    index_s = randint(0, vocab_len-1)
                     new_list.append(vocab[index_s])
                 new_list.extend(list(place))
                 new_list = tuple(new_list)
@@ -501,6 +447,7 @@ def get_neg_insert_prex_gen(place_names, vocab, count=3, insert_word_len=2):
                 
     return new_neg
 
+'''adjust the order of words of a true place name to form a negative place name'''
 def adjust_order_neg(place_names, last_words):
     new_places = []
     gen_places_c = 6
@@ -520,6 +467,7 @@ def adjust_order_neg(place_names, last_words):
                         new_places.append(temp_place)
     return new_places
 
+'''randomly choose 1 to <insert_word_len> words and insert them at the random position of a place name from <place_names>'''
 def get_neg_insert_random(place_names, vocab_list, insert_word_len = 4):
     new_neg = []
     vocab_len = len(vocab_list)
@@ -538,6 +486,7 @@ def get_neg_insert_random(place_names, vocab_list, insert_word_len = 4):
     return new_neg
 
 
+'''get the index of the second string list in the first string list'''
 
 def sub_str(first, second):
     count = 0
@@ -553,6 +502,8 @@ def sub_str(first, second):
     else:
         return []
 
+'''read the abr_file and load the <word, abbreviation> pairs'''
+
 def abbrevison(abr_file):
     with open(abr_file,mode='r') as csv_file:
         reader = csv.reader(csv_file, delimiter=',')
@@ -562,6 +513,9 @@ def abbrevison(abr_file):
             if len(tokens) == 1:
                 abbr[row[1]] = tokens[0] 
     return abbr
+
+'''extend the positive examples by replace the word in the original place name with the 
+   corresponding abbreviation word in the abr_file'''
 
 def replace_abbrevison(place_names,abr_file):
     #get abbrevision of place words
@@ -593,54 +547,8 @@ def replace_abbrevison(place_names,abr_file):
     place_names.extend(aug_place_names)
     return place_names, full,abbr
 
-def gen_short_names(place_names,min_len=4):
-    aug_place_names = []
-    for place in place_names:
-        if len(place) > min_len:
-            for i in range(0,min_len-2):
-                temp_place = copy.deepcopy(place)
-                temp_place.pop(i+1)
-                aug_place_names.append(temp_place)
-    place_names.extend(aug_place_names)
-    return place_names
 
-def get_negative(place_names, last_word_set, del_pair_count = 4):
-    neg_place_names = []
-    place_dic = {}
-    for place in place_names:
-        del_pair_c = del_pair_count
-        while (del_pair_c>0):
-            if len(place) > del_pair_c*2:
-                temp_place = list(copy.deepcopy(place))
-                for i in range(del_pair_c):
-                    temp_place.pop(0)
-                for i in range(del_pair_c):
-                    temp_place.pop(len(temp_place)-1)
-                temp_place = tuple(temp_place)
-                if temp_place[-1] not in last_word_set:
-                    neg_place_names.append(temp_place)
-                    if temp_place in place_dic.keys():
-                        place_dic[temp_place] += 1
-                    else:
-                        place_dic[temp_place] = 1
-            del_pair_c = del_pair_c -1
-        for word in place:
-            neg_place_names.append(tuple([word]))
-            if tuple([word]) in place_dic.keys():
-                place_dic[tuple([word])] += 1
-            else:
-                place_dic[tuple([word])] = 1
-    return neg_place_names,place_dic
-
-'''check if a place name contains the token that is not in the google or glove embedding vocabulary'''
-def bool_contain_outofbag(pure_vocabs, place_name):
-    bool_contain = False
-    for token in place_name:
-        if tuple([token]) not in pure_vocabs:
-            bool_contain = True
-            break
-    return bool_contain
-    
+'''copy an element mulitple times according to the value of the element in the dictionary'''
 def copyACount(neg, place_dic, fre_thres = 1):
     new_neg = []
     for pla in neg:
@@ -651,7 +559,6 @@ def copyACount(neg, place_dic, fre_thres = 1):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='manual to this script')
-    parser.add_argument('--osm', type=str, default='usl')
     parser.add_argument('--file', type=int, default=29)
     parser.add_argument('--ht', type=int, default=200)
     parser.add_argument('--lt', type=int, default=150)
@@ -673,14 +580,13 @@ if __name__ == '__main__':
     bool_insert_gen = True
     bool_alpha_gen = True
     bool_insert_last_word = True
-    bool_insert_preposition = False
     prepos_place_indicators = []
         
     sim_abv = abbrevison(file_name)
     argu_count = 150
     agu_num = 8
     highway_mark = {}
-    osm_file = 'data/'+args.osm+'.tsv'
+    osm_file = 'data/usl.tsv'
     chennai_osm_file = 'data/chennai.tsv'
     I_00_count = 0
     place_l = {}
@@ -728,7 +634,7 @@ if __name__ == '__main__':
     # extract general words from embeddings
     glove_emb_file = 'data/glove.6B.50d.txt'
     glove_emb, emb_dim = load_embeding(glove_emb_file)
-    google_emb_file = 'model/GoogleNews-vectors-negative300.bin'
+    google_emb_file = 'data/GoogleNews-vectors-negative300.bin'
     emb_model = KeyedVectors.load_word2vec_format(google_emb_file, binary=True)
     google_emb = emb_model.wv
     general_words_excep = ['monday','tuesday','northwest','wednesday','thursday','friday','saturday','sunday']
@@ -865,15 +771,15 @@ if __name__ == '__main__':
     more_general_words.extend(more_gen_words_2)
     more_general_words = list(set(more_general_words))
     total_w_fres = sum(list(word_fre_ori.values()))
-    extend_words = get_variable_words()
+#    extend_words = get_variable_words()
     new_general_word = []
     word_fre = []
     for word in word_fre_ori.keys():
         word_fre.append(word)
         new_general_word.extend([tuple([word.lower()])]*(int(word_fre_ori[word]*general_word_count/total_w_fres)))
-        for var_words in extend_words:
-            if word in var_words:
-                word_fre.extend(var_words)
+#        for var_words in extend_words:
+#            if word in var_words:
+#                word_fre.extend(var_words)
     general_words_first = []
     #general_words_first.extend(word_fre)
     general_words_first.extend(most_general_words)
@@ -898,6 +804,7 @@ if __name__ == '__main__':
     high_way_augmented = []
     postive_add = []
     state_augmented = []
+    '''extract raw place names from OSM'''
     with open(osm_file,encoding='utf-8') as tsvfile, open(chennai_osm_file,encoding='utf-8') as chennai_svfile:
         reader_base = csv.DictReader(tsvfile, dialect='excel-tab')
         reader_chennai = csv.DictReader(chennai_svfile, dialect='excel-tab')
@@ -1073,7 +980,7 @@ if __name__ == '__main__':
 #                                            real_corpus_dig_0.append(new_rpl)
                                         else:
                                             real_corpus_dig_0.append(rpl)
-                                                                            # argument the highway place name
+                                     # argument the highway place name
                                     if bool_highway_check and is_highway:
                                         illegar = True
                                         for pp in real_corpus_dig_0:
@@ -1145,7 +1052,8 @@ if __name__ == '__main__':
     stop_word_thres = args.lt
     stop_word_thres_first = args.ft
     before_alb_word = set([])
-    # count first and last words before augmentation
+    
+    ''' count first and last words before augmentation'''
     for place in place_names:
         if not hasNumbers(place[-1]):
             if place[-1] in last_word_set.keys():
@@ -1240,26 +1148,28 @@ if __name__ == '__main__':
     neg_num_prefix = list(set(glove_num_prefix).difference(set(positive_number_prefixs)))
     ''' add the number prefix word from the osm to that of negative ones 
     from google embedding, such as the highway''' 
+    inserted_neg = []
     
     '''combine the prefix word (e.g., ft) with numbers (e.g., 000) to form new negative examples such as [ft 000] and [00 ft]'''
-    negative_prefix_places = negative_prefix_num(neg_num_prefix, 40, [])
+    negative_prefix_places = negative_prefix_num(neg_num_prefix, 40)
     insert_negative_prefix_places = copy.deepcopy(negative_prefix_places)
     counter = collections.Counter(insert_negative_prefix_places)
     insert_negative_prefix_places = list(set(insert_negative_prefix_places).difference(set(aug_place_names)))
     insert_negative_prefix_places = copyACount(insert_negative_prefix_places, counter)
-
+    inserted_neg.extend(insert_negative_prefix_places)
+    print('insert_negative_prefix_places count: ' + len(insert_negative_prefix_places))
         
-    inserted_neg = []
 
     ''' extract the sub version of the positive examples as negative examples 
     if the end of the example is not place category name, such as street'''
     osm_gen_voc_fre = 10
-    short_negs, single_neg = short_neg(aug_place_names, last_words, first_words)
+    short_negs, single_neg = short_neg(aug_place_names, last_words)
     counter=collections.Counter(short_negs)
     short_negs = list(set(short_negs).difference(set(aug_place_names)))
     short_negs = copyACount(short_negs, counter)
     inserted_neg.extend(short_negs)
-
+    print('short_negs count: ' + len(short_negs))
+    
     '''create the general list from the gazetteer, ascii, number-prefix words, numbers, and pre-embedding vocubularies'''
     #get the general words from gazetteer 
     counter=collections.Counter(single_neg)
@@ -1305,13 +1215,15 @@ if __name__ == '__main__':
     counter=collections.Counter(neg_gens)
     neg_gens = copyACount(neg_gens, counter)
     inserted_neg.extend(neg_gens)
-    
+    print('neg_gens count: ' + len(neg_gens))
+
     '''general words are treated as negative samples'''
     new_vocab_tuple = [(x,) for x in vocab_list]
     counter = collections.Counter(new_vocab_tuple)
     general_neg = list(set(new_vocab_tuple).difference(set(aug_place_names)))
     general_neg = copyACount(general_neg, counter)
     inserted_neg.extend(general_neg)
+    print('general_neg count: ' + len(general_neg))
 
     '''insert the most general words before the place category words to generate negative examples, 
     for instance, 'on the way' and 'at the street' will be generated'''
@@ -1325,7 +1237,7 @@ if __name__ == '__main__':
     general_last_words_neg = copyACount(general_last_words_neg, counter)
     write_place('data/gene_after.txt',general_last_words_neg)
     inserted_neg.extend(general_last_words_neg)
-    print('negative count: ' + str(len(inserted_neg)))
+    print('general_last_words_neg count: ' + str(len(general_last_words_neg)))
 
     '''remove the imvalid place names in aug_place_names such as the street, 
     0 street altuhouth they are on the gazetteer'''
@@ -1342,6 +1254,7 @@ if __name__ == '__main__':
     ori_place_names = list(set(ori_place_names).difference(set(general_last_words_neg2)))
     ori_place_names = copyACount(ori_place_names, counter)
     inserted_neg.extend(general_last_words_neg2)
+    print('general_last_words_neg2 count: ' + str(len(general_last_words_neg2)))
 
     
     new_last_words = last_words
@@ -1353,6 +1266,8 @@ if __name__ == '__main__':
     counter = collections.Counter(general_last_words_neg3)
     general_last_words_neg3 = list(set(general_last_words_neg3).difference(set(aug_place_names)))
     general_last_words_neg3 = copyACount(general_last_words_neg3, counter)
+    inserted_neg.extend(general_last_words_neg3)
+    print('general_last_words_neg3 count: ' + str(len(general_last_words_neg3)))
 
 
     '''change the order of the tokens in the positive examples'''
@@ -1361,12 +1276,14 @@ if __name__ == '__main__':
     disorder_negs = list(set(disorder_negs).difference(set(aug_place_names)))
     disorder_negs = copyACount(disorder_negs, counter)
     inserted_neg.extend(disorder_negs)
+    print('disorder_negs count: ' + str(len(disorder_negs)))
 
 
     counter = collections.Counter(rem_sym_negs)
     rem_sym_negs = list(set(rem_sym_negs).difference(set(aug_place_names)))
     rem_sym_negs = copyACount(rem_sym_negs, counter)
     inserted_neg.extend(rem_sym_negs)
+    print('rem_sym_negs count: ' + str(len(rem_sym_negs)))
 
     '''randomly choose a coupl of general words and insert them in 
        the first and last of a positive example'''
@@ -1374,8 +1291,8 @@ if __name__ == '__main__':
     set_before_num_words = set(before_num_words)
     temp_neg = get_neg_insert(random_place_names, vocab_list, set_before_num_words, last_words, first_words, count=4)
     inserted_neg.extend(temp_neg)
-    print('negative count: ' + str(len(inserted_neg)))
-    
+    print('temp_neg count: ' + str(len(temp_neg)))
+
     
     '''combine ascii chars and numbers'''
     ascii_num_negs = ascii_num_neg(50)
@@ -1383,25 +1300,26 @@ if __name__ == '__main__':
     ascii_num_negs = list(set(ascii_num_negs).difference(set(aug_place_names)))
     ascii_num_negs = copyACount(ascii_num_negs, counter)
     inserted_neg.extend(ascii_num_negs)
+    print('ascii_num_negs count: ' + str(len(ascii_num_negs)))
 
     '''insert general words to the entity of negative_prefix_places, which consists of numbers and prefix words'''
-    inserted_neg_prefix =  get_neg_insert_prex_gen(negative_prefix_places, vocab_list) #get_neg_insert_random(negative_prefix_places, vocab_list, insert_word_len = 2)
+    inserted_neg_prefix =  get_neg_insert_prex_gen(negative_prefix_places, vocab_list) 
     counter = collections.Counter(inserted_neg_prefix)
     inserted_neg_prefix = list(set(inserted_neg_prefix).difference(set(aug_place_names)))
     inserted_neg_prefix = copyACount(inserted_neg_prefix, counter)
     inserted_neg.extend(inserted_neg_prefix)
+    print('inserted_neg_prefix count: ' + str(len(inserted_neg_prefix)))
 
     '''insert insert most gnereal words and place category words to the entity of negative_prefix_places, which consists of numbers and prefix words'''
     gen_last_mix_words = []
     gen_last_mix_words.extend(last_words)
     gen_last_mix_words.extend(most_general_words)
-    inserted_neg_prefix_2 =  get_neg_insert_prex_gen(negative_prefix_places, gen_last_mix_words) #get_neg_insert_random(negative_prefix_places, vocab_list, insert_word_len = 2)
+    inserted_neg_prefix_2 =  get_neg_insert_prex_gen(negative_prefix_places, gen_last_mix_words) 
     counter = collections.Counter(inserted_neg_prefix_2)
     inserted_neg_prefix_2 = list(set(inserted_neg_prefix_2).difference(set(aug_place_names)))
     inserted_neg_prefix_2 = copyACount(inserted_neg_prefix_2, counter)
     inserted_neg.extend(inserted_neg_prefix_2)
-
-    print('negative count: ' + str(len(inserted_neg)))
+    print('inserted_neg_prefix_2 count: ' + str(len(inserted_neg_prefix_2)))
 
     '''randomly combine numbers'''
     neg_gens_dig = general_words_neg_dig(num_gen_vocabs, 200000)
@@ -1417,7 +1335,7 @@ if __name__ == '__main__':
     neg_dig_names = list(set(neg_dig_names).difference(set(aug_place_names)))
     neg_dig_names = copyACount(neg_dig_names, counter)
     inserted_neg.extend(neg_dig_names)
-    print('negative count: ' + str(len(inserted_neg)))
+    print('neg_dig_names count: ' + str(len(neg_dig_names)))
     
     '''randomly combine numbers and ascill chars'''
     ascii_chars.extend(num_gen_vocabs2)
@@ -1426,7 +1344,7 @@ if __name__ == '__main__':
     asica_neg_gens = list(set(asica_neg_gens).difference(set(aug_place_names)))
     asica_neg_gens = copyACount(asica_neg_gens, counter)
     inserted_neg.extend(asica_neg_gens)
-    print('negative count: ' + str(len(inserted_neg)))
+    print('asica_neg_gens count: ' + str(len(asica_neg_gens)))
 
     '''randomly choose a coupl of general words and insert them in 
        the last of a positive example'''
@@ -1436,12 +1354,11 @@ if __name__ == '__main__':
     neg_insert_last = list(set(neg_insert_last).difference(set(aug_place_names)))
     neg_insert_last = copyACount(neg_insert_last, counter)
     inserted_neg.extend(neg_insert_last)
-    print('negative count: ' + str(len(inserted_neg)))
+    print('neg_insert_last count: ' + str(len(neg_insert_last)))
 
     '''randomly choose a coupl of general words and insert them in 
        the first of a positive example'''
-    ignore_first_words = []; 'west','north','east','south','northeast','southeast','northwest','southwest'
-    ignore_first_words.extend(prepos_place_indicators)
+    ignore_first_words = []; 
     ignore_first_words.extend(unseen_words)
     random_place_names = random.sample(aug_place_names, int(len(aug_place_names)/3))
     neg_insert_first = get_neg_insert_first(random_place_names, vocab_list, ignore_first_words, count=10)
@@ -1449,14 +1366,15 @@ if __name__ == '__main__':
     neg_insert_first = list(set(neg_insert_first).difference(set(aug_place_names)))
     neg_insert_first = copyACount(neg_insert_first, counter)
     inserted_neg.extend(neg_insert_first)
-    
+    print('neg_insert_first count: ' + str(len(neg_insert_first)))
+   
     '''insert numbers in the end of a positive name'''
-    neg_insert_last_num = get_neg_insert_last_num(aug_place_names, num_gen_vocabs, after_num_words_set, 2000000)
+    neg_insert_last_num = get_neg_insert_alpha(aug_place_names, num_gen_vocabs, after_num_words_set, 2000000)
     counter = collections.Counter(neg_insert_last_num)
     neg_insert_last_num = list(set(neg_insert_last_num).difference(set(aug_place_names)))
     neg_insert_last_num = copyACount(neg_insert_last_num, counter)
     inserted_neg.extend(neg_insert_last_num)
-    print('negative count: ' + str(len(inserted_neg)))
+    print('neg_insert_last_num count: ' + str(len(neg_insert_last_num)))
 
     '''insert numbers in the begining of a positive name'''
     neg_insert_first_num = get_neg_insert_first_num(aug_place_names, num_gen_vocabs, set_before_num_words, 2000000)
@@ -1464,14 +1382,15 @@ if __name__ == '__main__':
     neg_insert_first_num = list(set(neg_insert_first_num).difference(set(aug_place_names)))
     neg_insert_first_num = copyACount(neg_insert_first_num, counter)
     inserted_neg.extend(neg_insert_first_num)
-    
+    print('neg_insert_first_num count: ' + str(len(neg_insert_first_num)))
+
     '''insert prefix words and numbers in the begining and end of a positive name'''
     neg_insert_prex_num = get_neg_insert_prex_num(aug_place_names, negative_prefix_places, 3000000)
     counter = collections.Counter(neg_insert_prex_num)
     neg_insert_prex_num = list(set(neg_insert_prex_num).difference(set(aug_place_names)))
     neg_insert_prex_num = copyACount(neg_insert_prex_num, counter)
     inserted_neg.extend(neg_insert_prex_num)
-    print('negative count: ' + str(len(inserted_neg)))
+    print('neg_insert_prex_num count: ' + str(len(neg_insert_prex_num)))
     
     '''insert ascii char in the begining of a positive name'''
     neg_insert_alpha = get_neg_insert_alpha(aug_place_names, list(string.ascii_lowercase), list(before_alb_word), max_count=1000000)
@@ -1479,53 +1398,51 @@ if __name__ == '__main__':
     neg_insert_alpha = list(set(neg_insert_alpha ).difference(set(aug_place_names)))
     neg_insert_alpha = copyACount(neg_insert_alpha, counter)
     inserted_neg.extend(neg_insert_alpha)
-    print('negative count: ' + str(len(inserted_neg)))
-    
+    print('neg_insert_alpha count: ' + str(len(neg_insert_alpha)))
+
     if bool_alpha_gen:
         neg_insert_alpha_gen = get_neg_insert_alpha_gen(new_vocab_tuple, list(string.ascii_lowercase), list(before_alb_word), max_count=1000000)
         counter = collections.Counter(neg_insert_alpha_gen )
         neg_insert_alpha = list(set(neg_insert_alpha_gen).difference(set(aug_place_names)))
         neg_insert_alpha = copyACount(neg_insert_alpha_gen, counter)
         inserted_neg.extend(neg_insert_alpha_gen)
-        
+        print('neg_insert_alpha_gen count: ' + str(len(neg_insert_alpha_gen)))
+
     '''insert general words between two positive examples'''
     if bool_comb_neg_gen:
-        combine_neg_gen_places = combine_neg_gen(aug_place_names, most_general_words, count=2000000)
+        combine_neg_gen_places = combine_neg_gen(aug_place_names, most_general_words, max_count=2000000)
         counter = collections.Counter(combine_neg_gen_places)
         combine_neg_gen_places = list(set(combine_neg_gen_places).difference(set(aug_place_names)))
         combine_neg_gen_places = copyACount(combine_neg_gen_places, counter)
         inserted_neg.extend(combine_neg_gen_places)
-    
+        print('combine_neg_gen_places count: ' + str(len(combine_neg_gen_places)))
+
     '''combine two positive examples'''  
     if bool_comb_neg:
-        combine_neg_places = combine_neg(ori_place_names, count=5000000)
+        combine_neg_places = combine_neg(ori_place_names, max_count=5000000)
         counter = collections.Counter(combine_neg_places)
         combine_neg_places = list(set(combine_neg_places).difference(set(aug_place_names)))
         combine_neg_places = copyACount(combine_neg_places, counter)
         inserted_neg.extend(combine_neg_places)
+        print('combine_neg_places count: ' + str(len(combine_neg_places)))
 
     '''insert general words at the random position of the positive examples'''       
     if bool_insert_gen:
-        neg_ins_r_g = get_neg_insert_random_gen(aug_place_names, most_general_words, count=3000000)
+        neg_ins_r_g = get_neg_insert_random_gen(aug_place_names, most_general_words, max_count=3000000)
         counter = collections.Counter(neg_ins_r_g)
         neg_ins_r_g = list(set(neg_ins_r_g).difference(set(aug_place_names)))
         neg_ins_r_g = copyACount(neg_ins_r_g, counter)
         inserted_neg.extend(neg_ins_r_g)
-        
+        print('neg_ins_r_g count: ' + str(len(neg_ins_r_g)))
+
     '''insert place category words at the end of positive examples'''              
     if bool_insert_last_word:
-        neg_ins_last = insert_last_word(aug_place_names, last_words, count=1000000)
+        neg_ins_last = insert_last_word(aug_place_names, last_words, max_count=1000000)
         counter = collections.Counter(neg_ins_last)
         neg_ins_last = list(set(neg_ins_last).difference(set(aug_place_names)))
         neg_ins_last = copyACount(neg_ins_last, counter)
         inserted_neg.extend(neg_ins_last)
-        
-
-    
-    #inserted_neg.extend(neg_gens_dig)
-    inserted_neg.extend(insert_negative_prefix_places)
-    print(str(len(neg_dig_names))+ ' negative dig words')
-    inserted_neg.extend(general_last_words_neg3)
+        print('neg_ins_last count: ' + str(len(neg_ins_last)))
 
 
 
@@ -1536,23 +1453,10 @@ if __name__ == '__main__':
         unseen_negative = []
         for i in range(1000):
             unseen_negative.append(tuple(unseen_words))
-        inserted_neg.extend(unseen_words)
-        
-    if args.unseen:
-        more_general_words.append('0')
-        more_general_words.append('00')
-        more_general_words.append('000')
-        more_general_words.append('0000')
-        more_general_words.append('00000')
-        more_general_words.append('000000')
-        more_general_words.append('0000000')
-        more_general_words.append('00000000')
-        more_general_words.append('000000000')
-        more_general_words.append('0000000000')
-        more_general_words.append('00000000000')
-        more_general_words.extend(ascii_chars)
-        unseen_negative_gen = general_last_word2(more_general_words, unseen_words, 5)
-        inserted_neg.extend(unseen_negative_gen)
+        inserted_neg.extend(unseen_negative)
+        print('unseen_negative count: ' + str(len(unseen_negative)))
+
+    '''save positive and negative examples'''
         
     print('positive count: ' + str(len(ori_place_names)))
     lr_p = random.sample(ori_place_names, len(ori_place_names))
@@ -1564,6 +1468,3 @@ if __name__ == '__main__':
     lr = random.sample(inserted_neg, len(inserted_neg))
     write_place(neg_file,lr)
 
-    # save negative and positive place names
-    #np.savetxt('neg.txt',neg)
-    #np.savetxt('pos.txt',aug_place_names)
