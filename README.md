@@ -11,8 +11,10 @@ The first step of GazPNE is to train a model based on positive examples from gaz
 Several important data need to be prepared before generating the positive and negative examples. All data should be put in the ![data](data) folder.
 
 **OSM data**: We first collect positive examples from OpenStreetMap. Specifically, two boundary boxes are chosen to extract the OSM items via OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the South US and Sount India, respectively. The extracted files are named usl.tsv and chennai.tsv. Since we only extract osm data from the two areas, the trained model is now applicable in these two areas. We will extend the model by using the osm data in the whole US and India areas in the future. The two areas are show in the following figure:
-![alt-text-1](figure/us.jpg "title-1") ![alt-text-2](figure/chennai.jpg "title-2")
-
+<p float="left">
+  <img src="figure/us.jpg" width="100" />
+  <img src="figure/chennai.jpg" width="100" /> 
+</p>
 
 **Geonames data**: Two files are IN.txt and US.txt, which can be downloaded via (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively. We only want partial entites from GeoNames, which are not sufficently provided by OSMNames due to technical issues. [geonames.py](geonames.py) can be used to extract the required place names from the two files.
  > python geonames.py --c IN
