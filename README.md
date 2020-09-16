@@ -1,16 +1,17 @@
 # Gaz-PNE
 ## Basic description
-We propose a hybrid method that avoids these problems, named GazPNE, which fuses rules, gazetteers, and deep learning methods to achieve state-of-the-art-performance without requiring any manually annotated data. Specifically,  we  utilize C-LSTM,  a  fusion  of  Convolutional  and  Long  Short-Term Memory Neural Networks, to decide if an n-gram in a microblog text is a place name or not. The C-LSTM is trained on 4.6 million positive examples extracted from OpenStreetMap and GeoNames and 220 million negative examples synthesized by rules and  evaluated  on  4,500  disaster-related  tweets,  including  9,026 place names from three floods: 2016 in Louisiana (US), 2016 in Houston (US), and 2015 in Chennai (India). Our method improves the previous state-of-the-art by 7\% by achieving an F1 score of 0.87.
+We propose a hybrid method, named GazPNE, which fuses rules, gazetteers, and deep learning methods to achieve state-of-the-art-performance without requiring any manually annotated data. Specifically,  we  utilize C-LSTM,  a  fusion  of  Convolutional  and  Long  Short-Term Memory Neural Networks, to decide if an n-gram in a microblog text is a place name or not. The C-LSTM is trained on 4.6 million positive examples extracted from OpenStreetMap and GeoNames and 220 million negative examples synthesized by rules and  evaluated  on  4,500  disaster-related  tweets,  including  9,026 place names from three floods: 2016 in Louisiana (US), 2016 in Houston (US), and 2015 in Chennai (India). Our method improves the previous state-of-the-art by 7\% by achieving an F1 score of 0.87.
 
 The Architecture of GazPNE is as follows:
 ![Screenshot](figure/workflow.jpg)
 
 ## Neural Classifier
-The first step of GazPNE is to train a model based on positive examples from gazetters and negative examples sythesized by rules.
+The first step of GazPNE is to train a model based on positive examples from gazetters and negative examples sythesized by rules, which is descriped as follows:
 ### Training examples perparation
-Several important data need to be prepared before generating the negative and positive examples. All data should be put in the in the ![data](data) folder.
+Several important data need to be prepared before generating the positive and negative examples. All data should be put in the ![data](data) folder.
 
-**OSM data**: Used gazetters include OpenStreetMap and Geonames. Specifically, two boundary boxes are chosen to select the osm items from OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the South US and Sount India, respectively. The extracted files are named usl.tsv and chennai.tsv.
+**OSM data**: We first collect positive examples from OpenStreetMap. Specifically, two boundary boxes are chosen to extract the OSM items via OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the South US and Sount India, respectively. The extracted files are named usl.tsv and chennai.tsv. Since we only extract osm data from the two areas, the trained model is now applicable in these two areas. We will extend the model by using the osm data in the whole US and India areas in the future. The two areas are show in the following figure:
+
 
 **Geonames data**: Two files are IN.txt and US.txt, which can be downloaded via (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively. We only want partial entites from GeoNames, which are not sufficently provided by OSMNames due to technical issues. [geonames.py](geonames.py) can be used to extract the required place names from the two files.
  > python geonames.py --c IN
