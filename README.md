@@ -40,7 +40,7 @@ Specific word embedding can be obtained by applying the word2vector algorithm in
 
  > python word2vec-garzeteer.py --osmembed 2 --data 146
 
-Parameter <*osmembed*> denotes the ID of the specific word embedding and <*osmembed*> denotes the ID of the file saving the positive examples.
+Parameter <*osmembed*> denotes the ID of the specific word embedding and <*data*> denotes the ID of the file saving the positive examples.
 
 We provide the trained [specific Word embedding](https://drive.google.com/file/d/1xWl87ggoQIysydrXXqgRPr2rB4yzw8GU/view?usp=sharing). It should be put in the ![data](data) folder.
 
