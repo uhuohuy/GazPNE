@@ -63,7 +63,7 @@ Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl', which is
 Users can also download our [trained model](https://drive.google.com/file/d/10TokPTKJLwpjQR2oN-X03MO1GCEpeDyx/view?usp=sharing) and the other attached data, such as the total vocabularies and the trained bigram model. They should be put in the ![model](model) folder.
 
 ## 3.Place name tagging from tweet texts
-The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are avaliable and should be put in the ![data](data) folder. The trained model in can be then used to extract the place from the tweet data set by [model_test_json.py](model_test_json.py).
+The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are also provided and should be put in the ![data](data) folder. The trained model is then used to extract the place name from the tweet texts through [model_test_json.py](model_test_json.py).
 
 > python -u model_test_json.py --model_ID 0708233420 --atten_dim 120 --hidden 120 --filter_l 1 --epoch 1 --filter 1 --bool_remove 1  --region 1 --model 3 --osmembed 2 --thres 0.86 --bool_embed 0
 
