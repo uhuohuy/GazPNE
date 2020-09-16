@@ -57,14 +57,14 @@ We apply the C-LSTM  model to classify the place entities, which combines the CN
 
 Parameter <*model*> denotes the type of model that will be trained (CNN:0, Bi-LSTM:1, attention-CNN:2, clstm:3, attention-clstm:4). Two parameters <*postive*> and <*negative*> denote the ID of the file saving the positive examples and negative examples, respectively.
 
-Then, we can get a model named like 'clstm_model_0727135034epoch1.pkl', which is then manually renamed as '0727135034epoch1.pkl'. 0727135034 is the time to create the model, and also used as the ID of the model. We keep the trained model trained in each epoch. 
+Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl', which is then manually renamed as '0708233420epoch0.pkl'. 0708233420 is the time to create the model, and also used as the ID of the model. We keep the trained model in each epoch. 
 
 Users can also download our [trained model](https://drive.google.com/file/d/10TokPTKJLwpjQR2oN-X03MO1GCEpeDyx/view?usp=sharing) and the other attached data, such as the total vocabularies and the trained bigram model. They should be put in the ![model](model) folder.
 
 ## Place name tagging from tweet texts
 The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are avaliable and should be put in the ![data](data) folder. The trained model in can be then used to extract the place from the tweet data set by [model_test_json.py](model_test_json.py).
 
-> python -u model_test_json.py --model_ID 0727135034 --atten_dim 120 --hidden 120 --filter_l 1 --epoch 1 --filter 1 --bool_remove 1  --region 1 --model 3 --osmembed 2 --thres 0.82 --bool_embed 0
+> python -u model_test_json.py --model_ID 0708233420 --atten_dim 120 --hidden 120 --filter_l 1 --epoch 1 --filter 1 --bool_remove 1  --region 1 --model 3 --osmembed 2 --thres 0.86 --bool_embed 0
 
 Two parameters <*model_ID*> and <*epoch*> are used to determine which model will be used. Parameter <*model*> denotes the type of used model (CNN:0, Bi-LSTM:1, attention-CNN:2, clstm:3, attention-clstm:4). Parameter <*region*> denotes the test data set (Lousiana:0, Houston:1, Chennai:2). 
 
