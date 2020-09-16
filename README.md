@@ -10,13 +10,13 @@ The first step of GazPNE is to train a classification model based on positive ex
 ### Training data perparation
 Several important data need to be prepared before generating the positive and negative examples. All data should be put in the ![data](data) folder.
 
-**OSM data**: We first collect positive examples from OpenStreetMap. Specifically, two boundary boxes are chosen to extract the OSM items via OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the south US and sount India, respectively, as shown in the figure below. The extracted data are saved in usl.tsv and chennai.tsv, respectively.
+**OpenStreetMap data**: We first collect positive examples from OpenStreetMap (OSM). Specifically, two boundary boxes are chosen to extract the OSM items via OSMNames (https://osmnames.org/download/), and  they are [-104.79, 29.57, -74.5, 40.31] and [73.59, 8.58, 82.76, 20.47], covering the south US and sount India, respectively, as shown in the figure below. The extracted data are saved in usl.tsv and chennai.tsv, respectively.
 <p float="left">
   <img src="figure/us.jpg" width="400" />
   <img src="figure/chennai.jpg" width="400" /> 
 </p>
 
-**Geonames data**: Two files named IN.txt and US.txt, can be downloaded via (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively. We only need partial entites from GeoNames, such as schools and hospitals, which are not sufficently provided by OSMNames due to technical issues. [geonames.py](geonames.py) is used to extract the require place names from GeoNames.
+**GeoNames data**: Two files named IN.txt and US.txt, can be downloaded via (https://download.geonames.org/export/dump/). They corresponse to the data in the whole US and India areas, respectively. We only need partial entites from GeoNames, such as schools and hospitals, which are not sufficently provided by OSMNames due to technical issues. [geonames.py](geonames.py) is used to extract the require place names from GeoNames.
  > python geonames.py --c IN 
  
  This will generate [in_geonames.txt](data/in_geonames.txt) 
