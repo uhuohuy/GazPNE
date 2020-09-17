@@ -52,11 +52,11 @@ Next, the file for the negative examples is split into multiple smaller files wi
 
 We apply the C-LSTM  model to classify the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
 ![Screenshot](figure/architecture.jpg)
-[Garzetter_sim_pre.py](Garzetter_sim_pre.py) is used to train a model based on the positive and negative examples.
+[Garzetter_weight.py](Garzetter_weight.py) is used to train a model based on the positive and negative examples.
 
- > python -u Garzetter_sim_pre.py --epoch 2 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --model 3 --atten_dim 120 --cnn_hid 120  --filter_option 1 --filter_l 1 --max_cache 10 --hc 1 --osm_word_emb 1 --postive 146 --negative 146 --osmembed 2 --preloadsize 3000000
+python -u Garzetter_weight.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --lstm_dim 120 --cnn_hid 120 --filter_l 1 --max_cache 10 --hc 1 --osm_word_emb 1 --positive 146 --negative 146 --osmembed 2 --preloadsize 3000000
 
-Parameter <*model*> denotes the type of model that should be trained (CNN:0, Bi-LSTM:1, attention-CNN:2, clstm:3, attention-clstm:4). Two parameters <*postive*> and <*negative*> denote the ID of the file saving the positive examples and negative examples, respectively.
+Two parameters <*postive*> and <*negative*> denote the ID of the file saving the positive examples and negative examples, respectively.
 
 Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl', which is then manually renamed as '0708233420epoch0.pkl'. 0708233420 is the time to create the model, and also used as the ID of the model. We keep the trained model in each epoch. 
 
@@ -65,9 +65,9 @@ Users can also download our [trained model](https://drive.google.com/file/d/10To
 ## 3.Place name tagging from tweet texts
 The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are also provided and should be put in the ![data](data) folder. The trained model is then used to extract the place name from the tweet texts through [model_test_json.py](model_test_json.py).
 
-> python -u model_test_json.py --model_ID 0708233420 --atten_dim 120 --hidden 120 --filter_l 1 --epoch 0 --filter 1 --bool_remove 1  --region 1 --model 3 --osmembed 2 --thres 0.86 --bool_embed 0
+> python -u model_test_json.py --model_ID 0708233420 --lstm_dim 120 --hidden 120 --filter_l 1 --epoch 0  --bool_remove 1  --region 1 --osmembed 2 --thres 0.86
 
-Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parameter <*model*> denotes the type of used model (CNN:0, Bi-LSTM:1, attention-CNN:2, clstm:3, attention-clstm:4). Parameter <*region*> denotes the test data set (Lousiana:0, Houston:1, Chennai:2). 
+Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parameter <*region*> denotes the test data set (Lousiana:0, Houston:1, Chennai:2). 
 
 ## 4.Experimental results
 
