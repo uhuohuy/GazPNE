@@ -191,36 +191,30 @@ def sentence_embeding(sentence, trained_emb, word_idx,glove_emb,osm_emb,\
 
 def main():
     parser = argparse.ArgumentParser(description='manual to this script')
-    parser.add_argument('--model', type=int, default=3)
     parser.add_argument('--thres', type=float, default=0.82)
     parser.add_argument('--model_ID', type=str, default= '0224234050')
     parser.add_argument('--osmembed', type=int, default= 1)
     parser.add_argument('--osm_word_emb', type=int, default=1)
     parser.add_argument('--hc', type=int, default=1)
     parser.add_argument('--hidden', type=int, default=100)
-    parser.add_argument('--bool_embed', type=int, default=0)
     parser.add_argument('--region', type = int, default=1)
-    parser.add_argument('--atten_dim', type = int, default=80)
+    parser.add_argument('--lstm_dim', type = int, default=80)
     parser.add_argument('--epoch', type = int, default=0)
-    parser.add_argument('--filter', type = int, default=1)
     parser.add_argument('--filter_l', type = int, default=3)
     parser.add_argument('--bool_remove', type = int, default=1)
 
     args = parser.parse_args()
-    print ('model: '+str(args.model))
     print ('thres: '+str(args.thres))
     print ('model_ID: '+args.model_ID)
     print ('osmembed: '+str(args.osmembed))
     print ('osm_word_emb: '+str(args.osm_word_emb))
     print ('hc: '+str(args.hc))
     print ('hidden: '+str(args.hidden))
-    print ('atten_dim: '+str(args.atten_dim))
+    print ('lstm_dim: '+str(args.lstm_dim))
     print ('epoch: '+str(args.epoch))
-    print ('filter: '+str(args.filter))
     print ('filter_l: '+str(args.filter_l))
     print ('bool_remove: '+str(args.bool_remove))
 
-    model_type = args.model
     postive_pro_t = args.thres
     PAD_idx = 0
     s_max_len = 18
@@ -241,50 +235,22 @@ def main():
     word_idx_file = 'model/'+model_ID+'-vocab.txt'
     word2idx, max_char_len = load_word_index(word_idx_file)
     max_char_len = 20
-    if args.bool_embed==1:
-        glove_emb_file = 'model/GoogleNews-vectors-negative300.bin'
-        emb_model = KeyedVectors.load_word2vec_format(glove_emb_file, binary=True)
-        glove_emb = emb_model.wv
-        emb_dim = len(emb_model.wv['the'])
-    elif args.bool_embed==2:
-        glove_emb_file = 'data/glove.6B.100d.txt'
-        glove_emb, emb_dim = load_embeding(glove_emb_file)
-    else:
-        glove_emb_file = 'data/glove.6B.50d.txt'
-        glove_emb, emb_dim = load_embeding(glove_emb_file)
+    glove_emb_file = 'data/glove.6B.50d.txt'
+    glove_emb, emb_dim = load_embeding(glove_emb_file)
     weight_l = emb_dim+gaz_emb_dim+6
     weights_matrix = np.zeros((len(word2idx.keys()), weight_l))
     weights_matrix= torch.from_numpy(weights_matrix)
     tag_to_ix = {"p": 0, "n": 1}
     HIDDEN_DIM = args.hidden
-    lstm_layer_num = 2
     model_path = 'model/'+model_ID+'epoch'+str(args.epoch)+'.pkl'
-    OUTPUT_DIM = 1
     DROPOUT = 0.5
     flex_feat_len = 3
-    if args.filter:
-        FILTER_SIZES = [1,3,5]
-    else:
-        FILTER_SIZES = [2,3,4]
-        
-    if model_type == 1:
-        model = BiLSTM(weights_matrix, len(tag_to_ix), HIDDEN_DIM, lstm_layer_num)
-    elif model_type == 2:
-        model = AttentionCNN(weights_matrix, HIDDEN_DIM, FILTER_SIZES, OUTPUT_DIM, flex_feat_len, DROPOUT)        
-    elif model_type == 3:
-        fileter_l = args.filter_l
-        model = C_LSTM(weights_matrix, HIDDEN_DIM, fileter_l, args.atten_dim, len(tag_to_ix), flex_feat_len, DROPOUT)
-    elif model_type == 4:
-        fileter_l = args.filter_l
-        model = C_LSTMAttention(weights_matrix, HIDDEN_DIM, fileter_l, True, args.atten_dim, OUTPUT_DIM , flex_feat_len, DROPOUT)
-    else:
-        model = CNN(weights_matrix, HIDDEN_DIM, FILTER_SIZES, OUTPUT_DIM, flex_feat_len,DROPOUT)
+    
+    fileter_l = args.filter_l
+    model = C_LSTM(weights_matrix, HIDDEN_DIM, fileter_l, args.lstm_dim, len(tag_to_ix), flex_feat_len, DROPOUT)
     model.load_state_dict(torch.load(model_path,map_location='cpu'))
     model.eval()
-    if model_type == 1:
-        np_word_embeds = model.word_embeds.weight.detach().numpy()
-    else:
-        np_word_embeds = model.embedding.weight.detach().numpy() 
+    np_word_embeds = model.embedding.weight.detach().numpy() 
     index_t = 0
     time_str = datetime.now().strftime('%m%d%H%M%S')
     raw_result_file = 'data/cnn_result'+time_str+'.txt'
@@ -346,30 +312,10 @@ def main():
                                                   gaz_emb_dim,max_char_len,bool_mb_gaze,\
                                                  PAD_idx,START_WORD,bigram_model,char_hc_emb,flex_feat_len)
                     input_emb= torch.from_numpy(input_emb).float()
-                    if model_type==1:
-                        output = model.predict(input_emb)
-                        _, preds_tensor = torch.max(output, 1)
-                        pos_prob = output.detach().numpy()[:,1]
-                    elif model_type == 2:
-                        tem_output = model.predict(input_emb)
-                        pos_prob = torch.sigmoid(tem_output).detach().numpy()
-                        pos_prob = pos_prob.reshape(pos_prob.shape[0])
-                        preds_tensor = torch.round(torch.sigmoid(tem_output)).squeeze(1).detach()
-                    elif model_type == 3:
-                        output = model.predict(input_emb)
-                        _, preds_tensor = torch.max(output, 1)
-                        pos_prob = torch.sigmoid(output).detach().numpy()
-                        pos_prob = pos_prob[:,1]
-                    elif model_type == 4:
-                        tem_output = model.predict(input_emb)
-                        pos_prob = torch.sigmoid(tem_output).detach().numpy()
-                        pos_prob = pos_prob.reshape(pos_prob.shape[0])
-                        preds_tensor = torch.round(torch.sigmoid(tem_output)).squeeze(1).detach()
-                    else:
-                        tem_output = model.core(input_emb)
-                        pos_prob = torch.sigmoid(tem_output).detach().numpy()
-                        pos_prob = pos_prob.reshape(pos_prob.shape[0])
-                        preds_tensor = torch.round(torch.sigmoid(tem_output)).squeeze(1).detach()        
+                    output = model.predict(input_emb)
+                    _, preds_tensor = torch.max(output, 1)
+                    pos_prob = torch.sigmoid(output).detach().numpy()
+                    pos_prob = pos_prob[:,1]
                     preds = -preds_tensor.numpy()
                     postives = []
 
