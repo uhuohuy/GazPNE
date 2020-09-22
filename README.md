@@ -33,7 +33,7 @@ After preparing the above data, [rawTextProcessing.py](rawTextProcessing.py) is 
  
 Parameter <*file*> denotes the ID of the generated files, saving positive and negative examples, named positive**ID**.txt and negative**ID**.txt
 
-We provide our extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaPdasx5fz1Namx2XIxjkWIf/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KF5DEOwWq1D7QE9T-CLWy7X1fXJ9-x6S/view?usp=sharing) examples, named positive146.txt and negative146.txt, respectively.
+We provide our extracted [positive](https://drive.google.com/file/d/1ewQH4__dpWV0sMumhf7VLVKCh3fAGSIN/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KMGy2W82S5GtuJ9ghoT51MP48Gu-sqCk/view?usp=sharing) examples, named positive146.txt and negative146.txt, respectively.
 
 ### Specific Word embedding
 Specific word embedding can be obtained by applying the word2vector algorithm in the positive examples.
