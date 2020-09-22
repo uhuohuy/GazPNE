@@ -38,7 +38,7 @@ We provide our extracted [positive](https://drive.google.com/file/d/1YQaY9WMYAaP
 ### Specific Word embedding
 Specific word embedding can be obtained by applying the word2vector algorithm in the positive examples.
 
- > python word2vec-garzeteer.py --osmembed 2 --data 146
+ > python word2vec-gazetteer.py --osmembed 2 --data 146
 
 Parameter <*osmembed*> denotes the ID of the specific word embedding and <*data*> denotes the ID of the file saving the positive examples.
 
