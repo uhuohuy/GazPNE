@@ -1,6 +1,6 @@
 from Model import CNN,BiLSTM, C_LSTM,AttentionCNN,C_LSTMAttention
-from Garzetter_sim_pre import load_embeding
-from Garzetter_sim_pre import feat_char_loc
+from Gazetteer_weight import load_embeding
+from Gazetteer_weight import feat_char_loc
 import json, re
 import torch
 from utility import replace_digs,hasNumbers
