@@ -16,7 +16,7 @@ Several important data need to be prepared before generating the positive and ne
   <img src="figure/chennai.jpg" width="400" /> 
 </p>
 
-**GeoNames data**: Two files named IN.txt and US.txt, can be downloaded via (https://download.geonames.org/export/dump/). They corresponse the data in the whole US and India areas, respectively. We only need partial entites from GeoNames, such as schools and hospitals, which are not sufficently provided by OSMNames due to technical issues. [geonames.py](geonames.py) is used to extract the require place names from GeoNames.
+**GeoNames data**: Two files named IN.txt and US.txt, can be downloaded via (https://download.geonames.org/export/dump/). They corresponse the data in the whole US and India areas, respectively. We only need partial entites from GeoNames, such as schools and hospitals, which are not sufficently provided by OSMNames due to technical issues. [geonames.py](geonames.py) is used to extract the required place names from GeoNames.
  > python geonames.py --c IN 
  
  This will generate [in_geonames.txt](data/in_geonames.txt) 
