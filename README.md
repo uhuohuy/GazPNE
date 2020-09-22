@@ -56,7 +56,7 @@ We apply the C-LSTM  model to classify the place entities, which combines the CN
 
 python -u Gazetteer_weight.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --lstm_dim 120 --cnn_hid 120 --filter_l 1 --max_cache 10 --hc 1 --osm_word_emb 1 --positive 146 --negative 146 --osmembed 2 --preloadsize 3000000
 
-Two parameters <*postive*> and <*negative*> denote the ID of the file saving the positive examples and negative examples, respectively.
+Two parameters <*positive*> and <*negative*> denote the ID of the file saving the positive examples and negative examples, respectively.
 
 Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl', which is then manually renamed as '0708233420epoch0.pkl'. 0708233420 is the time to create the model, and also used as the ID of the model. We keep the trained model in each epoch. 
 
