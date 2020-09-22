@@ -72,4 +72,8 @@ Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parame
 
 ![Screenshot](figure/result.jpg)
 
+Figure below shows tagging result of 17 tweets. Bond text are the true place entity in the tweet. Underline texts are the incorrectly detected place entities.
+
+![Screenshot](figure/example.jpg)
+
 Apart from the annotated gold data, we also test our approach on the one without annotation of the place names, corresponding to the 2018 Florance Hurricane. There are in total 80,000 tweets. Quite good predicition results have also been observed.
