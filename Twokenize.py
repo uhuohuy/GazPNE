@@ -5,8 +5,6 @@ development philosophy: every time you change a rule, do a diff of this
 program's output on ~100k tweets.  if you iterate through many possible rules
 and only accept the ones that seeem to result in good diffs, it's a sort of
 statistical learning with in-the-loop human evaluation :)
-
-Modified by: Hussein S. Al-Olimat hussein@knoesis.org
 """
 
 __author__="brendan o'connor (anyall.org)"
