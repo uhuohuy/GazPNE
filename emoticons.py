@@ -1,7 +1,7 @@
 """ emoticon recognition via patterns.  tested on english-language twitter, but
 probably works for other social media dialects. """
 
-__author__ = "Brendan O'Connor (anyall.org, brenocon@gmail.com)"
+__author__ = "none"
 __version__= "april 2009"
 
 #from __future__ import print_function
