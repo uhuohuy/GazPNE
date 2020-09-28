@@ -2,7 +2,6 @@
 """
 Created on Mon Sep 23 14:00:59 2019
 it is used to extract name of public buildings from geonames, which are not provided by OSMNames 
-@author: hu_xk
 """
 import re
 import pandas as pd
