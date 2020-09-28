@@ -3,7 +3,6 @@
 """
 Created on Fri Jan  3 12:10:45 2020
 
-@author: hu_xk
 """
 
 import csv
