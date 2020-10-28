@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='manual to this script')
     parser.add_argument('--data', type=int, default=146)
-    parser.add_argument('--osmembed', type=float, default=2)
+    parser.add_argument('--osmembed', type=int, default=2)
     args = parser.parse_args()
     print ('data: '+str(args.data))
     print ('osmembed: '+str(args.osmembed))
