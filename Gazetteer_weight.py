@@ -188,8 +188,8 @@ def load_training_data_os(pos_f, neg_f, START_WORD, bigram_file, hc_file,PAD, pa
     pos_training_data = []
     '''search positive samples to create trainable samples'''
     neg_exe_str = 'wc -l ' + neg_f
-    negative_num = int(os.popen(neg_exe_str).read().split()[0]) 
-    split_c = int(negative_num / float(split_l))+1
+    negative_num = int(os.popen(neg_exe_str).read().split()[0])
+    split_c = math.ceil(negative_num / float(split_l))
     for i in range(split_c):
         print(str(i)+'...')
         if i < 26:
