@@ -1,9 +1,8 @@
 '''#############################################################################
+Copyright 2017 Hussein S. Al-Olimat, hussein@knoesis.org
 
 This software is released under the GNU Affero General Public License (AGPL)
 v3.0 License.
-9 September 202ß - Modified by ___.
-
 #############################################################################'''
 
 import re
@@ -16,7 +15,8 @@ from wordsegment import load, segment
 from operator import itemgetter
 from collections import defaultdict
 from spellchecker import SpellChecker
-from utility import hasNumbers, replace_digs
+from utility import hasNumbers, replace_digs,abbrevison1
+import copy
 import pdb
 load()
 spell = SpellChecker()
@@ -49,7 +49,7 @@ printable = set(string.printable)
 exclude = set(string.punctuation)
 
 url_re = r'\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*' # urls regular expression
-mentions_re = r"@\w+" # mentions regular expression
+mentions_re = r"@[\w\.]+" # mentions regular expression
 
 # LNEx global environment
 env = None
@@ -121,7 +121,7 @@ def get_removed_indices(tweet):
 
     return removedIndices
 
-def preprocess_tweet(tweet,word_list):
+def preprocess_tweet(tweet,word_list, remove_men=1):
     '''Preprocesses the tweet text and break the hashtags'''
 
     # remove retweet handler
@@ -142,7 +142,8 @@ def preprocess_tweet(tweet,word_list):
     tweet = tweet.replace("\n", " ").replace(" https", "").replace("http", "")
 
     # remove all mentions
-    tweet = re.sub(mentions_re, " @ ", tweet)
+    if remove_men:
+        tweet = re.sub(mentions_re, " @ ", tweet)
 
     # extract hashtags to break them -------------------------------------------
     hashtags = re.findall(r"#\w+", tweet)
@@ -161,8 +162,12 @@ def preprocess_tweet(tweet,word_list):
         _h = _h.translate(str.maketrans('','',''.join(string.punctuation)))
 
         # breaks the hashtag
-        if _h not in word_list:
+        if _h.lower() not in word_list:
             segments = segment(_h)
+            start_p = 0
+            for i, seg in enumerate(segments):
+                segments[i]=_h[start_p:start_p+len(seg)]
+                start_p=start_p+len(seg)
         else:
             segments = [_h]
         # concatenate the tokens with spaces between them
@@ -182,10 +187,12 @@ def preprocess_tweet(tweet,word_list):
     # --------------------------------------------------------------------------
 
     # padding punctuations
-    tweet = re.sub('([,!$%|?():])', r' \1 ', tweet)
-
-    tweet = tweet.replace(". ", " . ").replace("-", " ")
-
+#    tweet = re.sub('([,!$%|?():])', r' \1 ', tweet)
+    tweet = re.sub('([,$|%!?/&():])', r' \1 ', tweet)
+#    pdb.set_trace()
+#    tweet = tweet.replace("-", " ")#
+    tweet = tweet.replace(" 's", " ")#    
+#    tweet = tweet.replace(". ", " . ").replace("-", " ")#
     # shrink blank spaces in preprocessed tweet text to only one space
     tweet = re.sub('\s{2,}', ' ', tweet)
 
@@ -355,49 +362,126 @@ def align_and_split(raw_string, preprocessed_string):
 
         for match in matches:
             if match[1] >= last_index and match[1] not in removedIndices:
-                last_index = match[1]
+                last_index = match[2]
                 tokens.append(match)
                 break
 
     return tokens
 
 abbre_last = ['s','re','ve','t','m','ll']
-abbre_sym = ["'","?"]
+abbre_sym = ["'","?","’"]
 ################################################################################
 unseen_words = ['hiagnnamalnsw']
 
-def extract_sim(tweet, keys):
+def findhashtag_offset(query_tokens):
+    bool_token = False
+    found_offsets = []
+    first_offset = 0
+    end_offset = 0
+    for i, token in enumerate(query_tokens):
+        if token[0] == '#':
+    
+            if bool_token:
+                found_offsets.append([first_offset, end_offset])
+            first_offset = token[1]
+            end_offset = token[2]
+            bool_token = True
+        else:
+            if bool_token:
+                if end_offset == token[1] -1:
+                    end_offset = token[2]
+                    if i==len(query_tokens)-1:
+                        found_offsets.append([first_offset, end_offset])
+                else:
+                    found_offsets.append([first_offset, end_offset])
+                    bool_token = False
+    return found_offsets
+
+def replace_words(sub_output,sub_off_set,return_query_tokens):
+    one_d_sub_off = []
+    for off in sub_off_set:
+        one_d_sub_off.extend(off)
+    one_d_sen = []
+    for token in sub_output:
+        one_d_sen.extend(token)
+        
+    new_return= []
+    for subsuboff in return_query_tokens:
+        bool_matched = False
+        for i, s in enumerate(one_d_sub_off):
+            if s[0] >= subsuboff[1] and s[0] <= subsuboff[2] and \
+            s[1] >= subsuboff[1] and s[1] <= subsuboff[2]:
+                bool_matched = True
+                new_return.append(tuple([one_d_sen[i], s[0], s[1]]))
+        if not bool_matched:
+            new_return.append(subsuboff)
+    return new_return
+
+def extract_sim(tweet, keys, full=0, abb_dict={}):
     '''Extracts all location names from a tweet.'''
+#    abb_dict = {}
+#    abb_dict['u.s.'] = 'us'
+#    abb_dict['u.s.a'] = 'usa'
 
     # --------------------------------------------------------------------------
 
     #will contain for example: (0, 11): [(u'new avadi road', 3)]
-
-    valid_ngrams = defaultdict(list)
-
+#    print(ord(tweet[6]))
+    
+#    nfkd = unicodedata.normalize('NFKD', tweet)
+#    nfkd.replace("’", "'").encode('utf-8')
+    new_tweet = ""
+#    pdb.set_trace()
+    for char in tweet:
+        if ord(char)==8217:
+            new_tweet = new_tweet+"'"
+        else:
+            new_tweet = new_tweet+char
+    tweet = new_tweet
+#    print(new_tweet)
+#    return str(nfkd.encode('ASCII', 'ignore').decode('ASCII'))
+#
+#    valid_ngrams = defaultdict(list)
+#    print()
+    
+#    tweet.replace("’", "'").encode('utf-8')
+#    pdb.set_trace()
     tweet = strip_non_ascii(tweet)
 
     # we will call a tweet from now onwards a query
-    query = str(tweet.lower())
+    query = tweet; str(tweet.lower())
+    remove_men = 0
+    preprocessed_query = preprocess_tweet(query,keys, remove_men)
+    if remove_men:
+#    print(preprocessed_query)
+        query_tokens = align_and_split(query, preprocessed_query)
+    else:
+        new_preprocessed_query = re.sub(mentions_re, " @ ", preprocessed_query)
+        query_tokens = align_and_split(query, new_preprocessed_query)
+        ori_query_tokens = align_and_split(query, preprocessed_query)
+#    print(query_tokens)
+#    pdb.set_trace()
 
-    preprocessed_query = preprocess_tweet(query,keys)
+    if full:
+        return_query_tokens = copy.deepcopy(ori_query_tokens)
+        
+    hashtag_offsets = findhashtag_offset(query_tokens)
+#    pdb.set_trace()
 
-    query_tokens = align_and_split(query, preprocessed_query)
     #print(query_tokens)
     # --------------------------------------------------------------------------
     # prune the tree of locations based on the exisitence of stop words
     # by splitting the query into multiple queries
-    query_splits = Twokenize.tokenize(query)
+#    query_splits = Twokenize.tokenize(query)
     #stop_in_query =  set(query_splits)
 
     # if tweet contains the following then remove them from the tweet and
-    # split based on their presence: stop_in_query | 
+    # split based on their presence: stop_in_query | '.',
     extra_stop = set(['?']) #".", 
-    comma_stop_exc = ['st','t']
+    comma_stop_exc = ['st','t','T','ST','St','s','n','e','w','se', 'ne']
 
     stop_in_query =set(
-        ['[', ']',"#", '@',',','$','%', '(', ')', '.', '|', '!', ';', ':', '<', '>', "newline"])
-
+        ['[', ']','/',',','@','&','#','$','%', '(', ')', '.', '|', '!', ';', ':', '<', '>', "newline"]) #"#", 
     # remove stops from query
     stop_index = []
     del_index = []
@@ -425,7 +509,8 @@ def extract_sim(tweet, keys):
             new_tuple = tuple([query_tokens[index-1][0] + "'" + query_tokens[index+1][0],query_tokens[index-1][1], query_tokens[index+1][2]])
             insert_tuple.append(new_tuple)
     stop_index =list(set(stop_index))
-    
+#    pdb.set_trace()
+
     for index in stop_index:
         query_tokens[index] = ()
     query_tokens = [query_tokens[i] for i in range(token_len) if i not in del_index ]
@@ -434,7 +519,8 @@ def extract_sim(tweet, keys):
     # combine consecutive tokens in a query as possible location names
     query_filtered = list()
     candidate_location = {"tokens": list(), "offsets": list()}
-    
+#    pdb.set_trace()
+
     for index, token in enumerate(query_tokens):
         if len(token) > 0:
             candidate_location["tokens"].append(token[0].strip())
@@ -454,6 +540,9 @@ def extract_sim(tweet, keys):
     sub_off_set = []
     query_tokens = [qt[0] for qt in query_tokens if (qt != tuple())]
     #remove non special characters
+#    pdb.set_trace()
+#    pdb.set_trace()
+
     for sub_query in query_filtered: # ----------------------------------- for I
         sub_query_tokens = sub_query["tokens"]
         if len(sub_query_tokens) == 0:
@@ -462,7 +551,19 @@ def extract_sim(tweet, keys):
         new_offsets = []
         sub_offset = sub_query["offsets"]
         for c_idx, i in enumerate(sub_query_tokens):
-            temp = re.split('[^a-zA-Z^0-9]',i)
+            
+#            if i == 'U.S.':
+#                pdb.set_trace()
+#            pdb.set_trace()
+
+            if i.lower() not in abb_dict.keys():
+                temp = re.split('[^a-zA-Z^0-9]',i)
+            else:
+                new_to = ''
+                for char in i:
+                    if char != '.':
+                        new_to += char
+                temp = [new_to]
             offset = sub_offset[c_idx]
             split_count = 0
             sym_match = 0
@@ -483,235 +584,91 @@ def extract_sim(tweet, keys):
                     temp[-1] = 'will'
                 if temp[-1] == 's':
                     del temp[-1]
+
             for t in temp:
                 if t:
                     if hasNumbers(t):
 
                         groups = re.split('(\d+)',t)
                         groups = [g for g in groups if g]
+                        start_index = offset[0]
                         for g in groups:
-                            if g and hasNumbers(g):
-                                num_l = len(g)
-                                new_g = '0'*num_l
-                                new_tokens.append(new_g)
+#                            if g and hasNumbers(g):
+#                                num_l = len(g)
+#                                new_g = '0'*num_l
+#                                new_tokens.append(new_g)
+#                                split_count+=1
+#                            else:
+                            if g:
+                                new_tokens.append(g)
                                 split_count+=1
-                            else:
-                                if g:
-                                    new_tokens.append(g)
-                                    split_count+=1
+                                if len(temp)==1:
+                                    new_offsets.append((start_index, start_index+len(g)-1))
+                                    start_index=start_index+len(g)
+                                else:
+                                    new_offsets.append(offset)
+
                     else:
                         new_tokens.append(t)
                         split_count+=1
-            for KT in range(split_count):
-                new_offsets.append(offset)
+                        new_offsets.append(offset)
+
+#            for KT in range(split_count):
+#                new_offsets.append(offset)
         new_output = []
         new_offset_out = []
         for pp, w in enumerate(new_tokens):
-            if w not in keys:
-                new_w = spell.correction(w)
-                if (new_w == w):
-                    new_w = unseen_words[0]
-                new_output.append(new_w)
-                new_offset_out.append(new_offsets[pp])
-            else:
-                new_output.append(w)
-                new_offset_out.append(new_offsets[pp])
-
-        sub_output.append(new_output)
-        sub_off_set.append(new_offset_out)
-    return sub_output,sub_off_set
-
-def extract_sim2(tweet, keys):
-    '''Extracts all location names from a tweet.'''
-
-    # --------------------------------------------------------------------------
-
-    #will contain for example: (0, 11): [(u'new avadi road', 3)]
-
-    valid_ngrams = defaultdict(list)
-
-    tweet = strip_non_ascii(tweet)
-
-    # we will call a tweet from now onwards a query
-    query = str(tweet.lower())
-
-    preprocessed_query = preprocess_tweet(query,keys)
-
-    query_tokens = align_and_split(query, preprocessed_query)
-    #print(query_tokens)
-    # --------------------------------------------------------------------------
-    # prune the tree of locations based on the exisitence of stop words
-    # by splitting the query into multiple queries
-    query_splits = Twokenize.tokenize(query)
-    #stop_in_query =  set(query_splits)
-
-    # if tweet contains the following then remove them from the tweet and
-    # split based on their presence: stop_in_query | 
-    extra_stop = set(['?']) #".", 
-    comma_stop_exc = ['st','t']
-
-    stop_in_query =set([]) #
-
-    # remove stops from query
-    stop_index = []
-    del_index = []
-    insert_index = []
-    insert_tuple = []
-    token_len = len(query_tokens)
-    for index, token in enumerate(query_tokens):
-        if token[0] in stop_in_query:
-           if not (token[0] == '.' and query_tokens[index-1][0] in comma_stop_exc):
-               stop_index.append(index)
-            #query_tokens[index] = ()
-        if index > 0 and token[0] in extra_stop and  (query_tokens[index][1]-query_tokens[index-1][2]) >1:
-            stop_index.append(index)
-        if index < token_len-1 and token[0] in extra_stop and  (query_tokens[index+1][1]-query_tokens[index][2]) >1:
-            stop_index.append(index)
-        if index > 0 and index < token_len-1 and token[0] == '?' \
-                 and query_tokens[index+1][0] in abbre_last \
-                 and query_tokens[index-1][2]+1 == query_tokens[index][1] \
-                 and query_tokens[index][2]+1 == query_tokens[index+1][1]:
-
-            del_index.append(index-1)
-            del_index.append(index)
-            del_index.append(index+1)
-            insert_index.append(index-1-2*len(insert_tuple))
-            new_tuple = tuple([query_tokens[index-1][0] + "'" + query_tokens[index+1][0],query_tokens[index-1][1], query_tokens[index+1][2]])
-            insert_tuple.append(new_tuple)
-    stop_index =list(set(stop_index))
-    
-    for index in stop_index:
-        query_tokens[index] = ()
-    query_tokens = [query_tokens[i] for i in range(token_len) if i not in del_index ]
-    for i, index in enumerate(insert_index):
-        query_tokens.insert(index,insert_tuple[i])
-    # combine consecutive tokens in a query as possible location names
-    query_filtered = list()
-    candidate_location = {"tokens": list(), "offsets": list()}
-    
-    for index, token in enumerate(query_tokens):
-        if len(token) > 0:
-            candidate_location["tokens"].append(token[0].strip())
-            candidate_location["offsets"].append((token[1], token[2]))
-
-        elif candidate_location != "":
-            query_filtered.append(candidate_location)
-            candidate_location = {"tokens": list(), "offsets": list()}
-
-        # if I am at the last token in the list
-        # ex: "new avadi road" then it wont be added unless I know that this is
-        #        the last token then append whatever you have
-        if index == len(query_tokens) - 1:
-            query_filtered.append(candidate_location)
-    # Remove empty query tokens
-    sub_output = []
-    sub_off_set = []
-    query_tokens = [qt[0] for qt in query_tokens if (qt != tuple())]
-    #remove non special characters
-    for sub_query in query_filtered: # ----------------------------------- for I
-        sub_query_tokens = sub_query["tokens"]
-        if len(sub_query_tokens) == 0:
-            continue
-        new_tokens = []
-        new_offsets = []
-        sub_offset = sub_query["offsets"]
-        for c_idx, i in enumerate(sub_query_tokens):
-#            if i == "doesn't":
-#                pdb.set_trace()
-            temp = re.split('(\d+)',i)
-
-            offset = sub_offset[c_idx]
-            split_count = 0
-            sym_match = 0
-            for s in abbre_sym:
-                if s in i:
-                    sym_match = 1
-                    break
-#            if sym_match and len(temp)>= 2 and temp[-1] in abbre_last:
-#                if temp[-1] == 'm':
-#                    temp[-1] = 'am'
-#                if temp[-1] == 't':
-#                    temp[-1] = 'not'
-#                if temp[-1] == 've':
-#                    temp[-1] = 'have'
-#                if temp[-1] == 're':
-#                    temp[-1] = 'are'
-#                if temp[-1] == 'll':
-#                    temp[-1] = 'will'
-#                if temp[-1] == 's':
-#                    del temp[-1]
-            for t in temp:
-                if t:
-                    if hasNumbers(t):
-#                        t = replace_digs(t)
-#                        new_tokens.append(t)
-#                        split_count+=1
-
-                        groups = re.split('(\d+)',t)
-                        groups = [g for g in groups if g]
-#                        if len(groups) == 2 and hasNumbers(groups[0]) and not hasNumbers(groups[1]):
-#                            groups = []
-                        for g in groups:
-                            if g and hasNumbers(g):
-                                num_l = len(g)
-                                new_g = '0'*num_l
-                                new_tokens.append(new_g)
-                                split_count+=1
-                            else:
-                                if g:
-                                    new_tokens.append(g)
-                                    split_count+=1
-                    else:
-                        new_tokens.append(t)
-                        split_count+=1
-            for KT in range(split_count):
-                new_offsets.append(offset)
-            #new_tokens.extend([t for t in temp if t])
-            
-        #new_tokens2 = []
-        #split abc77de into abc 77 de
-        #for i in new_tokens:
-        #    groups = re.split('(\d+)',i)
-        #    new_tokens2.extend([t for t in groups if t])
-        #new_tokesn = [i for i in query_tokens if i not in ['//','"','*','...','~','.','..','/','&','....']]
-        #correct the misspelled word
-        
-        new_output = []
-        new_offset_out = []
-        for pp, w in enumerate(new_tokens):
-            if w not in keys:
+            if w.lower() not in keys and not hasNumbers(w):
+                # when a word is unknow, first try to segment the word. Otherwise correct it
 #                segments = segment(w)
+#                start_p = 0
+#                for i, seg in enumerate(segments):
+#                    segments[i]=w[start_p:start_p+len(seg)]
+#                    start_p=start_p+len(seg)
 #                if len(segments) > 1:
-#                    full_match = True
-#                    for new_s in segments:
-#                        if new_s not in keys:
-#                            full_match = False
-#                            break
-#                    if full_match:
-#                        cur_off_s = new_offsets[pp][0]
-#                        for idx, se in enumerate(segments):
-#                            new_output.append(se)
-#                            new_offset_out.append((cur_off_s,cur_off_s+len(se)-1))
-#                            cur_off_s = cur_off_s+len(se)
-#                    else:
-#                        new_output.append('why')
+#                    for seg in segments:
+#                        new_output.append(seg)
 #                        new_offset_out.append(new_offsets[pp])
+#                #correct the word
 #                else:
-                new_w = spell.correction(w)
+                new_w = w
+#                new_w = spell.correction(w)
+#                new_w = new_w.replace(" ", "")
 #                if (new_w == w):
 #                    new_w = unseen_words[0]
                 new_output.append(new_w)
                 new_offset_out.append(new_offsets[pp])
-#                    else:
-#                        new_output.append('why')
-#                        new_offset_out.append(new_offsets[pp])
-#                else:
-#                    new_output.append('why')
-#                    new_offset_out.append(new_offsets[pp])
             else:
                 new_output.append(w)
                 new_offset_out.append(new_offsets[pp])
+        if new_output:
+            sub_output.append(new_output)
+            sub_off_set.append(new_offset_out)
+    if full:
+        return_query_tokens = replace_words(sub_output,sub_off_set,return_query_tokens)
+        return sub_output,sub_off_set,return_query_tokens, hashtag_offsets
+    else:
+        return sub_output,sub_off_set
 
-        sub_output.append(new_output)
-        sub_off_set.append(new_offset_out)
-    return sub_output,sub_off_set
+if __name__== "__main__":
+#    print(extract_sim('@CNBC_Awaaz Magma Fincrop Ltd. buy 3th @166.25 hold or sell?', [], full=1))
+#    print(extract_sim('RT @HTownRD: #HoustonFlood at 34th & White Oak Bayou https://t.co/EQiY06SkQd', [], full=1))
+    file_name = 'data/osm_abbreviations_globe.csv'
+        
+    sim_abv = abbrevison1(file_name)
+    abv_punk = {}
+    for key in sim_abv.keys():
+        new_abv = ''
+        for i, char in enumerate(key):
+#            if key == 'us':
+#                pdb.set_trace()
+#            if i != len(key)-1:
+                new_abv += char + '.'
+#            else:
+#                new_abv += char
+        abv_punk[new_abv]=key
+    print(abv_punk)
+#    sub_output,sub_off_set,return_query_tokens, hashtag_offsets = extract_sim("RT @Nervana_1: Welcome to the Southern province of #Iran RT @AlArabiya_Eng: Houthi rebels seize control of main entrances",[], 1, abv_punk)
+
+    sub_output,sub_off_set,return_query_tokens, hashtag_offsets = extract_sim("Read the latest #Turkey Crackdown Chronicle , CPJ ’s weekly round-up of #pressfreedom violations in the #country",[], 1, abv_punk)
+    print(return_query_tokens, hashtag_offsets)

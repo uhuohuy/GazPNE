@@ -4,17 +4,23 @@ import torch.optim as optim
 import numpy as np
 import codecs
 import math
-
+from gensim.models import KeyedVectors
 from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 from datetime import datetime
 from bigramProb import createBigramModel
 import random
 import argparse
-from Model import C_LSTM
+from Model import C_LSTM, CNN, BiLSTM
 import os
 import sys
+import torch.nn.functional as F
 import psutil
+from BertEmbeds import BertEmbeds
+from memory_profiler import profile
+import time
+import shutil
+
 torch.manual_seed(1)
 def argmax(vec):
     # return the argmax as a python int
@@ -108,18 +114,24 @@ def extract_wid(pos_f,word_to_ix_n,ix_to_word_n,target_vocab_n):
 
 
 ''' load training examples from file and convert the word to word id '''
-def extract_feat(pos_f,tag,x_train_n, y_train_n,hc_feats_before_n,word_to_ix_n,ix_to_word_n,target_vocab_n,listOfProb,START_WORD,flex_feat_len,max_char_len,max_len,pad_index):
+def extract_feat(pos_f,tag,x_train_n, y_train_n,hc_feats_before_n,word_to_ix_n,ix_to_word_n,target_vocab_n,listOfProb,START_WORD,flex_feat_len,max_char_len,max_len,pad_index, append=0, multiple=0):
     postive_num = 0
     for line in open(pos_f):
         line = line.strip()
-        if len(line) == 0:
+        if len(line) <= append:
             continue
         sentence = line.split(' ')
+        if append:
+            del sentence[-1]
         sen_len = len(sentence)
+        #ignore single-word entity and just learn from multi-word entities
+        if multiple and sen_len==1:
+            continue
         if sen_len > max_len:
-            del sentence[0:sen_len-max_len]
+            continue
+#            del sentence[0:sen_len-max_len]
         postive_num = postive_num + 1
-        y_train_n.append(tag)
+        y_train_n.append(int(tag))
         temp_s = []
         temp_hc = []
         for j, word in enumerate(sentence):
@@ -160,7 +172,7 @@ def extract_feat(pos_f,tag,x_train_n, y_train_n,hc_feats_before_n,word_to_ix_n,i
 '''load the training data from positive file ( positive examples) and negative file ( negative examples).
 to improve the effenciency of loading the negative examples, the negative file was splited into mulitple smaller
  file with each contraining at most 10 million examples    '''
-def load_training_data_os(pos_f, neg_f, START_WORD, bigram_file, hc_file,PAD, pad_index, flex_feat_len, max_char_len, max_len, bool_hc, split_l, ratio=1.0):
+def load_training_data_os(pos_f, neg_f, START_WORD, bigram_file, hc_file,PAD, pad_index, flex_feat_len, max_char_len, max_len, bool_hc, split_l, append=0, multiple = 0):
     s_index = []
     word_to_ix = {}
     ix_to_word = {}
@@ -175,9 +187,11 @@ def load_training_data_os(pos_f, neg_f, START_WORD, bigram_file, hc_file,PAD, pa
     with codecs.open(pos_f, 'r',encoding='utf-8') as file:
         for line in file:
             line = line.strip()
-            if len(line) == 0:
+            if len(line) <= append:
                 continue
             tokens = line.split(' ')
+            if append:
+                del tokens[-1]
             pos_training_data.append(tokens)
     print('pos memory:' +str(sys.getsizeof(pos_training_data)/(1024.0*1024.0)))
     print(len(pos_training_data))
@@ -188,14 +202,13 @@ def load_training_data_os(pos_f, neg_f, START_WORD, bigram_file, hc_file,PAD, pa
     pos_training_data = []
     '''search positive samples to create trainable samples'''
     neg_exe_str = 'wc -l ' + neg_f
-    negative_num = int(os.popen(neg_exe_str).read().split()[0])
+    negative_num = int(os.popen(neg_exe_str).read().split()[0]) 
     split_c = math.ceil(negative_num / float(split_l))
     for i in range(split_c):
         print(str(i)+'...')
-        if i < 26:
-            neg_f_i = neg_f[0:len(neg_f)-4] + 'a' + chr(i+97)
-        else:
-            neg_f_i = neg_f[0:len(neg_f)-4] + 'b' + chr(i-26+97)
+        first_l = int(i/26)
+        last_l = i%26
+        neg_f_i = neg_f[0:len(neg_f)-4] + chr(first_l+97)+ chr(last_l+97)
            
         word_to_ix,ix_to_word,target_vocab = extract_wid(neg_f_i,word_to_ix,ix_to_word,target_vocab)
 
@@ -206,7 +219,7 @@ def load_training_data_os(pos_f, neg_f, START_WORD, bigram_file, hc_file,PAD, pa
 
     x_train, y_train,hc_feats_before,word_to_ix,ix_to_word,target_vocab,postive_num = extract_feat(pos_f,1,x_train, \
                                                y_train, hc_feats_before,word_to_ix,ix_to_word,target_vocab,listOfProb,\
-                                                START_WORD,flex_feat_len,max_char_len,max_len,pad_index)
+                                                START_WORD,flex_feat_len,max_char_len,max_len,pad_index,append,multiple)
     y_train = np.array(y_train)
     x_train = np.array(x_train)
     hc_feats_before = np.array(hc_feats_before)       
@@ -229,16 +242,18 @@ def feat_char_loc(word, max_char_len):
         return_char_loc_vector.append(len(word)-i)
     return return_char_loc_vector
 
-
 def main():
     # parse parameters
+    start_time = time.time()
     time_str = datetime.now().strftime('%m%d%H%M%S')
     parser = argparse.ArgumentParser(description='manual to this script')
     parser.add_argument('--epoch', type=int, default=8)
     parser.add_argument('--train-batch-size', type=int, default=1000)
     parser.add_argument('--test-batch-size', type=int, default=1000)
     parser.add_argument('--osm_word_emb', type=int, default=1)
+    parser.add_argument('--emb', type=int, default=1)
     parser.add_argument('--hc', type=int, default=1)
+    parser.add_argument('--model', type=int, default=2)
     parser.add_argument('--positive', type=int, default=12)
     parser.add_argument('--negative', type=int, default=12)
     parser.add_argument('--osmembed', type=int, default=2)
@@ -250,6 +265,12 @@ def main():
     parser.add_argument('--cnn_hid', type=int, default=120)
     parser.add_argument('--optim', type=int, default=1)
     parser.add_argument('--weight', type=float, default=1)
+    parser.add_argument('--multiple', type=int, default=0)
+    parser.add_argument('--load_checkpoint', type=int, default=0)
+    parser.add_argument('--check_point_id', type=str, default='1011114857')
+    parser.add_argument('--max_len', type=int, default=20)
+
+
 
     args = parser.parse_args()
     print ('epoch: '+str(args.epoch))
@@ -268,8 +289,19 @@ def main():
     print ('cnn_hid: '+str(args.cnn_hid))
     print ('optim: '+str(args.optim))
     print ('weight: '+str(args.weight))
+    print ('emb: '+str(args.emb))
+    print ('multiple: '+str(args.multiple))    
+    print ('load_checkpoint: '+str(args.load_checkpoint))
+    print ('check_point_id: '+str(args.check_point_id))
+    print ('model: '+str(args.model))
+    print ('max_len: '+str(args.max_len))
 
+    #copy osmnames file
+    orifile='data/osmnames'+str(args.positive)+'.txt'
+    dstfile = 'data/osmnames'+time_str+'.txt'
+    shutil.copy(orifile,dstfile)
 
+    orifile='data/osmnames'+str(args.positive)+'.txt'
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     START_WORD = 'start_string_taghu'
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -282,18 +314,34 @@ def main():
     bigram_file = 'model/'+ time_str+'-bigram.txt'
     hc_file = 'model/'+ time_str+'-hcfeat.txt'
     vocab_file = 'model/'+ time_str+'-vocab.txt'
-
     PAD = 'paddxk'
     pad_index = 0
     max_char_len = 20
-    max_len = 20
+    max_len = args.max_len
     flex_feat_len = 3
-    glove_emb_file = 'data/glove.6B.50d.txt'
-    glove, emb_dim = load_embeding(glove_emb_file)
-    gazetteer_emb_file = 'data/osm_vector'+str(args.osmembed)+'.txt'
+            # map words to its word embeding
+    if args.emb==2:
+        glove_emb_file = 'data/GoogleNews-vectors-negative300.bin'
+        emb_model = KeyedVectors.load_word2vec_format(glove_emb_file, binary=True)
+        emb_dim = len(emb_model.wv['the'])
+        glove =  emb_model.wv
+    elif args.emb==3:
+        glove_emb_file = 'data/glove.6B.100d.txt'
+        glove, emb_dim = load_embeding(glove_emb_file)
+    elif args.emb==4:
+        BertEmbed = BertEmbeds('data/uncased_vocab.txt', 'data/uncased_bert_vectors.txt')
+        glove, emb_dim = BertEmbed.load_bert_embedding()
+#        glove_emb_file = 'data/glove.6B.50d.txt'
+#        glove, emb_dim = load_embeding(glove_emb_file)
+    else:
+        glove_emb_file = 'data/glove.6B.50d.txt'
+        glove, emb_dim = load_embeding(glove_emb_file)
 
+#    glove_emb_file = 'data/glove.6B.50d.txt'
+#    glove, emb_dim = load_embeding(glove_emb_file)
+    gazetteer_emb_file = 'data/osm_vector'+str(args.osmembed)+'.txt'
     split_c, x_train_pos, y_train_pos, data_index_pos, negative_num, word_hcfs, hc_feats_before_pos, word_to_ix, ix_to_word, target_vocab,listOfProb = \
-                          load_training_data_os(pos_f,neg_f,START_WORD, bigram_file, hc_file,PAD,pad_index,flex_feat_len,max_char_len,max_len,bool_hc,args.split_l)#
+                          load_training_data_os(pos_f,neg_f,START_WORD, bigram_file, hc_file,PAD,pad_index,flex_feat_len,max_char_len,max_len,bool_hc,args.split_l, multiple=args.multiple)#
     pos_unit = int(len(data_index_pos)*args.split_l/negative_num)
     print('memory % used:', psutil.virtual_memory()[2])
 
@@ -312,7 +360,7 @@ def main():
     if bool_hc: 
         hc_len = 6
     else:
-        hc_len = 0 
+        hc_len = 0
     matrix_len = len(word_to_ix)
     weight_dim = emb_dim+gaz_emb_dim+hc_len
     print('weight_dim: ' + str(weight_dim))
@@ -373,10 +421,22 @@ def main():
     weight_loss = args.weight
     weight = [1, float(weight_loss*negative_num/len(data_index_pos))]
     weight_tensor=torch.from_numpy(np.array(weight)).float().cuda()
-    fileter_l = args.filter_l
-    model_path = 'model/clstm_model_'+time_str
-    model = C_LSTM(weights_matrix, HIDDEN_DIM, fileter_l, args.lstm_dim, len(tag_to_ix), flex_feat_len, DROPOUT).to(device)
-    criterion = nn.CrossEntropyLoss(weight=weight_tensor)
+    if args.model == 1:
+        model_path = 'model/lstm_model_'
+        model = BiLSTM(weights_matrix, len(tag_to_ix), HIDDEN_DIM, lstm_layer_num,flex_feat_len).to(device)
+        criterion = nn.CrossEntropyLoss(weight=weight_tensor)
+    elif args.model == 2:
+        fileter_l = args.filter_l
+        model_path = 'model/clstm_model_'
+        model = C_LSTM(weights_matrix, HIDDEN_DIM, fileter_l, args.lstm_dim, len(tag_to_ix), flex_feat_len, DROPOUT).to(device)
+        criterion = nn.CrossEntropyLoss(weight=weight_tensor)
+    else:
+        FILTER_SIZES = [1,2,3]
+        OUTPUT_DIM = 2
+        model_path = 'model/cnn_model_'
+        model = CNN(weights_matrix, HIDDEN_DIM, FILTER_SIZES, OUTPUT_DIM, flex_feat_len, DROPOUT).to(device)
+        criterion =  nn.BCEWithLogitsLoss(pos_weight=weight_tensor) #
+    
     criterion.cuda()
     pytorch_total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print("numer of trainable parameters: {0}".format(pytorch_total_params), file=f_record)
@@ -385,6 +445,20 @@ def main():
         optimizer = optim.SGD(model.parameters(), lr=0.001, weight_decay=1e-4)
     else:
         optimizer = optim.Adam(model.parameters(),lr=0.001)
+    
+    output_dir = model_path + args.check_point_id+'_checkpoint.pt'
+    if args.load_checkpoint and os.path.exists(output_dir):
+        checkpoint = torch.load(output_dir, map_location='cpu')
+        start_epoch = checkpoint['epoch']+1
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        print('Loaded the pretrain model, epoch:',checkpoint['epoch'])
+    else:
+        start_epoch = 0
+#        valid_acc_prev = 0
+#        valid_f1_prev = 0
+    
+        
     index_list= random.sample(range(split_c), split_c)
     train_size = math.ceil(0.9 * split_c)
     train_idx, test_idx = index_list[:train_size+1], index_list[train_size+1:]
@@ -394,22 +468,22 @@ def main():
         max_cache_size = args.max_cache
     cache_data = []
     cache_index = []
-    for epoch in range(
+    for epoch in range(start_epoch,
             args.epoch):  # again, normally you would NOT do 300 epochs, it is toy data
         model.train()
+        cur_loss = []
         for idx in train_idx:
             print(str(idx)+'...')
-            if idx < 26:
-                neg_f_i = neg_f[0:len(neg_f)-4] + 'a' + chr(idx+97)
-            else:
-                neg_f_i = neg_f[0:len(neg_f)-4] + 'b' + chr(idx-26+97)
+            first_l = int(idx/26)
+            last_l = idx%26
+            neg_f_i = neg_f[0:len(neg_f)-4] + chr(first_l+97)+ chr(last_l+97)
             x_train_neg = []
             y_train_neg = []
             hc_feats_before_neg = []
             if idx not in cache_index:
                 x_train_neg, y_train_neg, hc_feats_before_neg, word_to_ix,ix_to_word,target_vocab,cur_neg_num = extract_feat(neg_f_i,0,x_train_neg, \
                                            y_train_neg, hc_feats_before_neg,word_to_ix,ix_to_word,target_vocab,listOfProb,\
-                                            START_WORD,flex_feat_len,max_char_len,max_len,pad_index)
+                                            START_WORD,flex_feat_len,max_char_len,max_len,pad_index,multiple=args.multiple)
                 if len(cache_index) < max_cache_size:
                     cache_index.append(idx)
                     cache_data.append([x_train_neg, y_train_neg, hc_feats_before_neg,cur_neg_num ])
@@ -444,35 +518,56 @@ def main():
                 x_tr = torch.tensor(x_train[r_index_list[loop*args.preloadsize:last_idx]], dtype=torch.long)
                 y_tr = torch.tensor(y_train[r_index_list[loop*args.preloadsize:last_idx]], dtype=torch.float)
                 hc_tr = torch.tensor(hc_feats_before[r_index_list[loop*args.preloadsize:last_idx]], dtype=torch.float)
+#                print('x_tr', len(x_tr))
                 train = TensorDataset(x_tr,y_tr,hc_tr)
-                trainloader = DataLoader(train, batch_size=args.train_batch_size,pin_memory=True,num_workers = 4)
+                trainloader = DataLoader(train, batch_size=args.train_batch_size,pin_memory=True,num_workers = 1)
                 for sentence, tags, hcs in trainloader:
                     sentence, tags = sentence.to(device), tags.to(device)
+#                    print('sen', len(sentence), 'tags', len(tags))
+#                    print('sen size', sentence.size(), 'tags size', tags.size())
+                    if list(sentence.size())[0] == 1:
+                        continue
+
                     hcs = hcs.view(len(sentence),max_len,flex_feat_len).to(device)
                     # Step 1. Remember that Pytorch accumulates gradients.
                     model.zero_grad()
                     predictions = model(sentence,hcs)
-                    loss = criterion(predictions, tags.squeeze().long())
+#                    print('predictions size', len(predictions))
+                    if args.model== 1 or args.model== 2:
+                        loss = criterion(predictions, tags.squeeze().long())
+                    else:
+#                        print(tags.unsqueeze(1))
+#                        print(predictions)
+#                        print(tags)
+                        tags_hot = F.one_hot(tags.long(), 2)
+                        tags_hot = tags_hot.type_as(predictions)
+                        loss = criterion(predictions, tags_hot)
+#                        loss = criterion(predictions, tags.unsqueeze(1))
+#                        loss = criterion(predictions, tags.squeeze().long())
+#                    loss = criterion(predictions, tags.squeeze().long())
                     loss.backward()
+                    cur_loss.append(loss.item())
                     optimizer.step()
+                    
+        # Save a checkpoint
+        torch.save({'epoch': epoch, 'optimizer_state_dict': optimizer.state_dict(),'model_state_dict': model.state_dict(), 'loss': loss}, model_path+time_str+'_checkpoint.pt')
+        print('epoch:'+str(epoch) + ' '+ str(np.mean(cur_loss)))
         correct = 0
         incorrect_place = []
         model.eval()
         test_sample_size = 0
         for idx in test_idx:
             print(str(idx)+'...')
-            if idx < 26:
-                neg_f_i = neg_f[0:len(neg_f)-4] + 'a' + chr(idx+97)
-            else:
-                neg_f_i = neg_f[0:len(neg_f)-4] + 'b' + chr(idx-26+97)
-
+            first_l = int(idx/26)
+            last_l = idx%26
+            neg_f_i = neg_f[0:len(neg_f)-4] + chr(first_l+97)+ chr(last_l+97)
             x_train_neg = []
             y_train_neg = []
             hc_feats_before_neg = []
             if idx not in cache_index:
                 x_train_neg, y_train_neg, hc_feats_before_neg, word_to_ix,ix_to_word,target_vocab,cur_neg_num = extract_feat(neg_f_i,0,x_train_neg, \
                                            y_train_neg,hc_feats_before_neg,word_to_ix,ix_to_word,target_vocab,listOfProb,\
-                                            START_WORD,flex_feat_len,max_char_len,max_len,pad_index)
+                                            START_WORD,flex_feat_len,max_char_len,max_len,pad_index,multiple=args.multiple)
                 if len(cache_index) < max_cache_size:
                     cache_index.append(idx)
                     cache_data.append([x_train_neg, y_train_neg, hc_feats_before_neg,cur_neg_num ])
@@ -514,7 +609,14 @@ def main():
                     data, tags = data.to(device), tags.to(device)
                     hcs = hcs.view(len(data),max_len,flex_feat_len).to(device)
                     output = model(data,hcs)
-                    preds_tensor = output.argmax(dim=1)
+                    if args.model == 1:
+                        _, preds_tensor = torch.max(output, 1)
+                    elif args.model == 2:
+                        preds_tensor = output.argmax(dim=1)
+                    else:
+                        preds_tensor = output.argmax(dim=1)
+#                        preds_tensor = torch.round(torch.sigmoid(output)).squeeze(1)
+#                    preds_tensor = output.argmax(dim=1)
                     correct += sum(preds_tensor.eq(tags).cpu().numpy())
                     data,tags = data.to('cpu'), tags.to('cpu')
                     for i, se in enumerate(data):
@@ -529,12 +631,16 @@ def main():
                             #correct_place.append(cur_s)
                         else:
                             incorrect_place.append(cur_s)
-        incorrect_file = 'experiments/h'+ str(HIDDEN_DIM)+'epoch'+str(epoch)+time_str+'inc.txt'
-        write_place(incorrect_file, incorrect_place)
         #write_place(correct_file, correct_place)
-        print("test accuracy: %f", correct/test_sample_size)
-        print("test accuracy: {0}".format(correct/test_sample_size),file=f_record)
-        torch.save(model.state_dict(), model_path+'epoch'+str(epoch)+'.pkl')
+        if test_sample_size:
+            incorrect_file = 'experiments/h'+ str(HIDDEN_DIM)+'epoch'+str(epoch)+time_str+'inc.txt'
+            write_place(incorrect_file, incorrect_place)
+            print("test accuracy: %f", correct/test_sample_size)
+            print("test accuracy: {0}".format(correct/test_sample_size),file=f_record)
+        
+        torch.save(model.state_dict(), model_path+time_str+'epoch'+str(epoch)+'.pkl')
+        print('total time:', time.time()-start_time)
+
     f_record.close()
 if __name__ == '__main__':
     main()
