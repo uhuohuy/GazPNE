@@ -5,7 +5,7 @@ We propose a hybrid method, named GazPNE, which fuses rules, gazetteers, and dee
 The Workflow of GazPNE is shown in the figure below.
 ![Screenshot](figure/workflow.jpg)
 
-Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/10TokPTKJLwpjQR2oN-X03MO1GCEpeDyx/view?usp=sharing) and unzip the data into the ![model](model) folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed. Our model was trained based on the OSM data in the US and India. Thus, it can only reconginze the place in the US and India.
+Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the ![model](model) folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed. Our model was trained based on the OSM data in the US and India. Thus, it can only reconginze the place in the US and India.
 
 ## 2.Model training
 The first step of GazPNE is to train a classification model based on positive examples from gazetteers and negative examples sythesized by rules.
