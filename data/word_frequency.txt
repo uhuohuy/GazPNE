@@ -929,14 +929,14 @@
 929     onto  i  43538  0.92
 930     reveal  v  42605  0.94
 931     direction  n  41280  0.97
-932     weapon  n  43158  0.93
+932     september  n  43158  0.93
 933     employee  n  42824  0.93
 934     cultural  j  45673  0.87
 935     contain  v  42542  0.94
 936     peace  n  42273  0.94
 937     head  v  41658  0.95
 938     control  v  41771  0.95
-939     base  n  41154  0.96
+939     bayou  n  41154  0.96
 940     pain  n  41350  0.96
 941     apply  v  42391  0.93
 942     play  n  41662  0.95
@@ -1005,9 +1005,9 @@
 1005     hotel  n  39642  0.95
 1006     soldier  n  39552  0.95
 1007     reflect  v  40687  0.92
-1008     heavy  j  39160  0.96
-1009     sexual  j  41865  0.89
-1010     cause  n  38843  0.96
+1008     june  j  39160  0.96
+1009     august  j  41865  0.89
+1010     july  n  38843  0.96
 1011     bag  n  40007  0.93
 1012     heat  n  40363  0.92
 1013     fall  n  38822  0.96
@@ -1095,7 +1095,7 @@
 1095     assume  v  35960  0.95
 1096     wind  n  36478  0.94
 1097     key  j  36056  0.95
-1098     professional  j  36319  0.93
+1098     waterfall  n  36319  0.93
 1099     mission  n  35217  0.96
 1100     fast  r  35474  0.95
 1101     alone  r  34982  0.96
@@ -3772,7 +3772,7 @@
 3772     format  n  7910  0.90
 3773     trait  n  7980  0.89
 3774     currency  n  7753  0.91
-3775     turkey  n  7757  0.91
+3775     turkeys  n  7757  0.91
 3776     reserve  n  7585  0.93
 3777     beam  n  7625  0.93
 3778     abuse  v  7554  0.94

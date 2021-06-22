@@ -180,7 +180,6 @@ haven,hvn
 head,hd
 heads,hd
 heights,hgts
-heights,ht
 heights,hts
 high school,hs
 highroad,hird
@@ -331,7 +330,6 @@ rue,rue
 run,run
 saint,st
 saints,ss
-salai,street
 senior,sr
 serviceway,svwy
 serviceway,swy
@@ -417,10 +415,154 @@ william,wm
 wynd,wyn
 wynd,wynd
 yard,yd
+university,univer
+vermont,vt
+massachusetts,ma
+new york,ny
+maine,me
+new hampshire,nh
+new brunswick,nb
+texas,tx
+illinois,il
+missouri,mo
+kansas,ks
+oklahoma,ok
+arkansas,ar
+nebraska,ne
+iowa,ia
+south dakota,sd
+north dakota,nd
+kentucky,ky
+indiana,in
+tennessee,tn
+mississippi,ms
+alabama,al
+georgia,ga
+colorado,co
+wyoming,wy
+utah,ut
+new mexico,nm
+arizona,az
+florida,fl
+ohio,oh
+west virginia,wv
+district of columbia,dc
+pennsylvania,pa
+delaware,de
+maryland,md
+montana,mt
+idaho,id
+wisconsin,wi
+minnesota,mn
+nevada,nv
+california,ca
+oregon,or
+washington,wa
+michigan,mi
+connecticut,ct
+hawaii,hi
 south carolina,sc
+virginia,va
 north carolina,nc
 louisiana,la
-mississippi,ms
-houston,hou
+new jersey,nj
+rhode island,ri
+alaska,ak
+tamil nadu,tn
+puducherry,py
+himachal pradesh,hp
+sikkim,sk
+delhi,dl
+uttar pradesh,up
+haryana,hr
+punjab,pb
+chandigarh,ch
+rajasthan,rj
+jammu and kashmir,jk
+gujarat,gj
+madhya pradesh,mp
+maharashtra,mh
+bihar,br
+west bengal,wb
+jharkhand,jh
+chhattisgarh,ct
+odisha,or
+kerala,kl
+karnataka,ka
+andhra pradesh,ap
+andaman and nicobar islands,an
+assam,as
+tripura,tr
+arunachal pradesh,ar
+lakshadweep,ld
+meghalaya,ml
+manipur,mn
+nagaland,nl
+mizoram,mz
+telangana,tg
+united states,us
+india,in
+cocos (keeling) islands,cc
+christmas island,cx
+heard island and mcdonald islands,himi
+new south wales,nsw
+northern territory,nt
+queensland,qld
+south australia,sa
+western australia,wa
+victoria,vic
+australian capital territory,act
+jervis bay territory,jbt
+tasmania,tas
+vermont,vt
+massachusetts,ma
+new york,ny
+maine,me
+new hampshire,nh
+new brunswick,nb
 texas,tx
-university,univer
+illinois,il
+missouri,mo
+kansas,ks
+oklahoma,ok
+arkansas,ar
+nebraska,ne
+iowa,ia
+south dakota,sd
+north dakota,nd
+kentucky,ky
+indiana,in
+tennessee,tn
+mississippi,ms
+alabama,al
+georgia,ga
+colorado,co
+wyoming,wy
+utah,ut
+new mexico,nm
+arizona,az
+florida,fl
+ohio,oh
+west virginia,wv
+"washington, d.c.",dc
+pennsylvania,pa
+delaware,de
+maryland,md
+montana,mt
+idaho,id
+wisconsin,wi
+minnesota,mn
+nevada,nv
+california,ca
+oregon,or
+washington,wa
+michigan,mi
+connecticut,ct
+hawaii,hi
+south carolina,sc
+virginia,va
+north carolina,nc
+louisiana,la
+new jersey,nj
+rhode island,ri
+united states,usa
