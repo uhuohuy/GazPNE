@@ -3,7 +3,7 @@
 We propose a hybrid method, named GazPNE, which fuses rules, gazetteers, and deep learning methods to achieve state-of-the-art-performance without requiring any manually annotated data. Specifically,  we utilize C-LSTM, a fusion of Convolutional and Long Short-Term Memory Neural Networks, to decide if an n-gram in a microblog text is a place name or not. The C-LSTM is trained on 6.8 million positive examples extracted from OpenStreetMap covering the US and India and 388.1 million negative examples synthesized by rules and  evaluated  on  4,500  disaster-related  tweets,  including  9,026 place names from three floods: 2016 in Louisiana (US), 2016 in Houston (US), and 2015 in Chennai (India). Our method achieve an F1 score of 0.84.
 
 The Workflow of GazPNE is shown in the figure below.
-![Screenshot](figure/workflow.jpg)
+![Screenshot](figure/workflow.png)
 
 Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the ![model](model) folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed. Our model was trained based on the OSM data in the US and India. Thus, it can only reconginze the place in the US and India.
 
@@ -32,7 +32,7 @@ Next, the file for the negative examples is split into multiple smaller files wi
 ### Train a C-LSTM model
 
 We apply the C-LSTM  model to classify the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
-![Screenshot](figure/architecture.jpg)
+![Screenshot](figure/architecture.png)
 [Gazetteer_weight.py](Gazetteer_weight.py) is used to train a model based on the positive and negative examples.
 
 python -u Gazetteer_weight.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --lstm_dim 120 --cnn_hid 120 --filter_l 1 --max_cache 10 --hc 1 --osm_word_emb 1 --positive 146 --negative 146 --osmembed 2 --preloadsize 3000000 --emb 1 --osm_word_emb 0 --max_len=20
