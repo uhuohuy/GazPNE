@@ -61,4 +61,5 @@ Apart from the annotated gold data, we also apply our approach on the data set w
 ## 5. Citing
 If you do make use of GazPNE or any of its components please cite the following publication:
 
-
+## 6. Contact
+If you have any questions, feel free to contact Xuke Hu via xuke.hu@dlr.de
