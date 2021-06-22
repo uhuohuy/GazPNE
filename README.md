@@ -33,7 +33,7 @@ We apply the C-LSTM  model to classify the place entities, which combines the CN
 ![Screenshot](figure/architecture.jpg)
 [Gazetteer_weight.py](Gazetteer_weight.py) is used to train a model based on the positive and negative examples.
 
-python -u Gazetteer_weight.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --lstm_dim 120 --cnn_hid 120 --filter_l 1 --max_cache 10 --hc 1 --osm_word_emb 1 --positive 146 --negative 146 --osmembed 2 --preloadsize 3000000
+python -u Gazetteer_weight.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --lstm_dim 120 --cnn_hid 120 --filter_l 1 --max_cache 10 --hc 1 --osm_word_emb 1 --positive 146 --negative 146 --osmembed 2 --preloadsize 3000000 --emb 1 --osm_word_emb 0 --max_len=20
 
 Two parameters <*positive*> and <*negative*> denote the ID of the file saving the positive examples and negative examples, respectively.
 
