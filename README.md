@@ -43,7 +43,7 @@ Users can also download our [trained model](https://drive.google.com/file/d/10To
 ## 3.Place name tagging from tweet texts
 The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, Louisiana 2016, and Houston 2016 floods. The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are provided and should be put in the ![data](data) folder. The trained model is then used to extract the place name from the tweet texts through [model_test_json.py](model_test_json.py).
 
-> python -u model_test.py --model_ID 0708233420  --epoch 0  --region 1 --thres 0.70
+> python -u model_test.py --model_ID 0319140518  --epoch 11  --region 1 --thres 0.70
 
 Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parameter <*region*> denotes the test data set (Lousiana:0, Houston:1, Chennai:2). Parameter <*thres*> denotes the score threshold used to select the valid place name. 
 
