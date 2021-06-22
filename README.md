@@ -25,7 +25,7 @@ Parameter <*file*> denotes the ID of the generated files, saving positive and ne
 
 We provide our extracted [positive](https://drive.google.com/file/d/1ewQH4__dpWV0sMumhf7VLVKCh3fAGSIN/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KMGy2W82S5GtuJ9ghoT51MP48Gu-sqCk/view?usp=sharing) examples, named positive146.txt and negative146.txt, respectively.
 
-Next, the file for the negative examples is split into multiple smaller files with each containing at most 10 million lines (examples) to improve the efficiency of reading the negative examples.
+Next, the file for the negative examples is split into multiple smaller files with each containing at most 2 million lines (examples) to improve the efficiency of reading the negative examples.
 
  > split -l 2000000 data/negative146.txt data/negative146
  
