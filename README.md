@@ -17,7 +17,7 @@ Several important data need to be prepared before generating the positive and ne
 
 After preparing the above data, [rawTextProcessing.py](rawTextProcessing.py) is used to extract the positive examples and negative examples. 
 
- > python rawTextProcessing.py --file 146 --ht 500 --lt 500 --ft 20 --unseen 1
+ > python rawTextProcessing.py --file 146 --ht 500 --lt 500 --ft 500 --unseen 1
  
 Parameter <*file*> denotes the ID of the generated files, saving positive and negative examples, named positive**ID**.txt and negative**ID**.txt
 
