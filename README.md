@@ -5,6 +5,8 @@ We propose a hybrid method, named GazPNE, which fuses rules, gazetteers, and dee
 The Workflow of GazPNE is shown in the figure below.
 ![Screenshot](figure/workflow.jpg)
 
+Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/10TokPTKJLwpjQR2oN-X03MO1GCEpeDyx/view?usp=sharing) and unzip the data into the ![model](model) folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed.
+
 ## 2.Model training
 The first step of GazPNE is to train a classification model based on positive examples from gazetteers and negative examples sythesized by rules.
 ### Training data perparation
@@ -39,8 +41,10 @@ Two parameters <*positive*> and <*negative*> denote the ID of the file saving th
 
 Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl'. 0708233420 is the time to create the model, and also used as the ID of the model. We keep the trained model in each epoch. 
 
-Users can also download our [trained model](https://drive.google.com/file/d/10TokPTKJLwpjQR2oN-X03MO1GCEpeDyx/view?usp=sharing) and the other data, such as the total vocabularies and the trained bigram model. They should be put in the ![model](model) folder. 
+
+
 ## 3.Place name tagging from tweet texts
+
 The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, Louisiana 2016, and Houston 2016 floods. The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are provided and should be put in the ![data](data) folder. The trained model is then used to extract the place name from the tweet texts through [model_test_json.py](model_test_json.py).
 
 > python -u model_test.py --model_ID 0319140518  --epoch 11  --region 1 --thres 0.70
