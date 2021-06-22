@@ -1,6 +1,7 @@
 # GazPNE
 ## 1.Basic description
-We propose a hybrid method, named GazPNE, which fuses rules, gazetteers, and deep learning methods to achieve state-of-the-art-performance without requiring any manually annotated data. Specifically,  we utilize C-LSTM, a fusion of Convolutional and Long Short-Term Memory Neural Networks, to decide if an n-gram in a microblog text is a place name or not. The C-LSTM is trained on 6.8 million positive examples extracted from OpenStreetMap covering the US and India and 388.1 million negative examples synthesized by rules and  evaluated  on  4,500  disaster-related  tweets,  including  9,026 place names from three floods: 2016 in Louisiana (US), 2016 in Houston (US), and 2015 in Chennai (India). Our method achieve an F1 score of 0.84.
+We propose a hybrid method, named GazPNE, which fuses rules, gazetteers, and deep learning methods to achieve state-of-the-art-performance without requiring any manually annotated data. It can extract place names at both coarse (e.g., country and city) and fine-grained (e.g., street and creek) levels and
+place names with abbreviations (e.g., ‘tx’ for ‘Texas’ and ‘studemont rd’ for ‘studemont road’). Specifically,  we utilize C-LSTM, a fusion of Convolutional and Long Short-Term Memory Neural Networks, to decide if an n-gram in a microblog text is a place name or not. The C-LSTM is trained on 6.8 million positive examples extracted from OpenStreetMap covering the US and India and 388.1 million negative examples synthesized by rules and  evaluated  on  4,500  disaster-related  tweets,  including  9,026 place names from three floods: 2016 in Louisiana (US), 2016 in Houston (US), and 2015 in Chennai (India). Our method achieve an F1 score of 0.84.
 
 The Workflow of GazPNE is shown in the figure below.
 ![Screenshot](figure/workflow.png)
@@ -54,10 +55,6 @@ Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parame
 ## 4.Experimental results
 
 ![Screenshot](figure/result.jpg)
-
-Figure below shows tagging result of 17 tweets. Bond text are the true place entity in the tweet. Underline texts are the incorrectly detected place entities.
-
-![Screenshot](figure/example.png)
 
 Apart from the annotated gold data, we also apply our approach on the data set without annotation, corresponding to the 2018 Florance Hurricane. There are over 100,000 tweets. The tagging result by our approach is saved in [florence_result.txt](experiments/florence_result.txt).
 
