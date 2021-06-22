@@ -59,4 +59,4 @@ Figure below shows tagging result of 17 tweets. Bond text are the true place ent
 
 ![Screenshot](figure/example.jpg)
 
-Apart from the annotated gold data, we also test our approach on the one without annotation of the place names, corresponding to the 2018 Florance Hurricane. There are over 100,000 tweets. The tagging result by our approach is saved in [florence_result.txt](experiments/florence_result.txt).
+Apart from the annotated gold data, we also apply our approach on the data set without annotation, corresponding to the 2018 Florance Hurricane. There are over 100,000 tweets. The tagging result by our approach is saved in [florence_result.txt](experiments/florence_result.txt).
