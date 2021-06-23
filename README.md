@@ -54,7 +54,7 @@ Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parame
 
 ## 4.Experimental results
 
-![Screenshot](figure/result.jpg)
+![Screenshot](figure/result.png)
 
 Apart from the annotated gold data, we also apply our approach on the data set without annotation, corresponding to the 2018 Florance Hurricane. There are over 100,000 tweets. The tagging result by our approach is saved in [florence_result.txt](experiments/florence_result.txt).
 
