@@ -55,7 +55,7 @@ Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl'. 07082334
 
 ## 3.Place name tagging from tweet texts
 
-The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, Louisiana 2016, and Houston 2016 floods. The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) should be put under the ![data](data) folder. The trained model is then used to extract the place name from the tweets through [model_test.py](model_test.py).
+The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, Louisiana 2016, and Houston 2016 floods. The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) should be put under the <_data_> folder. The trained model is then used to extract the place name from the tweets through [model_test.py](model_test.py).
 
 > python -u model_test.py --model_ID 0319140518  --epoch 11  --region 1 --thres 0.70
 
