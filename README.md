@@ -7,10 +7,9 @@ The Workflow of GazPNE is shown in the figure below.
 
 <p align="center">
 <a href="url">
- <img src="figure/workflow.png" height="400" width="50" ></a>
+ <img src="figure/workflow.png" height="50" width="400" ></a>
 </p>
 
-![Screenshot](figure/workflow.png)
 
 Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the ![model](model) folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed. Our model was trained based on the OSM data in the US and India. Thus, it can  reconginze the place in the US and India.
 
