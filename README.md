@@ -11,12 +11,12 @@ The Workflow of GazPNE is shown in the figure below.
 </p>
 
 
-Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the <_model_> folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed. Our model was trained based on the OSM data in the US and India. Thus, it can  reconginze the place in the US and India.
+Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the _model_ folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed. Our model was trained based on the OSM data in the US and India. Thus, it can  reconginze the place in the US and India.
 
 ## 2.Model training
 The first step of GazPNE is to train a classification model based on positive examples from gazetteers and negative examples sythesized by rules.
 ### Training data perparation
-Several important data need to be prepared before generating the positive and negative examples. All data should be put in the <_data_> folder.
+Several important data need to be prepared before generating the positive and negative examples. All data should be put in the _data_ folder.
 
 **OpenStreetMap data**: Retrive OSM data in the US and India from ([OSMNames](https://osmnames.org/download/)), which are saved in us.tsv and india.tsv, respectively.
 
@@ -55,7 +55,7 @@ Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl'. 07082334
 
 ## 3.Place name tagging from tweet texts
 
-The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, Louisiana 2016, and Houston 2016 floods. The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) should be put under the <_data_> folder. The trained model is then used to extract the place name from the tweets through [model_test.py](model_test.py).
+The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, Louisiana 2016, and Houston 2016 floods. The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) should be put under the _data_ folder. The trained model is then used to extract the place name from the tweets through [model_test.py](model_test.py).
 
 > python -u model_test.py --model_ID 0319140518  --epoch 11  --region 1 --thres 0.70
 
