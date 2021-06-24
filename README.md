@@ -29,7 +29,7 @@ After preparing the above data, [rawTextProcessing.py](rawTextProcessing.py) is 
  
 Parameter <*file*> denotes the ID of the generated files, saving positive and negative examples, named positive**ID**.txt and negative**ID**.txt
 
-We has also provided our extracted [positive](https://drive.google.com/file/d/1ewQH4__dpWV0sMumhf7VLVKCh3fAGSIN/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KMGy2W82S5GtuJ9ghoT51MP48Gu-sqCk/view?usp=sharing) examples, named positive216.txt and negative216.txt, respectively.
+We has also provided our extracted [positive](https://drive.google.com/file/d/1DZsclFIWxBS-MpBAfMDJvkfQLeUN9sre/view?usp=sharing) and [negative](https://drive.google.com/file/d/1E8ym0Bqd7LBcHvvgp2eXtiQz8yFJAWf2/view?usp=sharing) examples, named positive216.txt and negative216.txt, respectively.
 
 Next, the file saving the negative examples is split into multiple smaller files with each containing at most 2 million lines (examples) to improve the efficiency of loading the negative examples.
 
