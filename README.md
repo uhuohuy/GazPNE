@@ -4,6 +4,7 @@ We propose a hybrid method, named GazPNE, which fuses rules, gazetteers, and dee
 place names with abbreviations (e.g., ‘tx’ for ‘Texas’ and ‘studemont rd’ for ‘studemont road’). Specifically,  we utilize C-LSTM, a fusion of Convolutional and Long Short-Term Memory Neural Networks, to decide if an n-gram in a microblog text is a place name or not. The C-LSTM is trained on 6.8 million positive examples extracted from OpenStreetMap covering the US and India and 388.1 million negative examples synthesized by rules and  evaluated  on  4,500  disaster-related  tweets,  including  9,026 place names from three floods: 2016 in Louisiana (US), 2016 in Houston (US), and 2015 in Chennai (India). Our method achieve an F1 score of 0.84.
 
 The Workflow of GazPNE is shown in the figure below.
+
 ![Screenshot](figure/workflow.png)
 
 Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the ![model](model) folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed. Our model was trained based on the OSM data in the US and India. Thus, it can  reconginze the place in the US and India.
@@ -33,8 +34,8 @@ Next, the file saving the negative examples is split into multiple smaller files
 ### Train a C-LSTM model
 
 We apply the C-LSTM  model to classify the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
-<a href="url"><img src="figure/architecture.png" align="center" height="700" width="500" ></a>
 
+<a href="url"><img src="figure/architecture.png" align="center" height="700" width="500" ></a>
 
 [Gazetteer_weight.py](Gazetteer_weight.py) is used to train a model based on the positive and negative examples.
 
