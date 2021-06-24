@@ -11,12 +11,12 @@ The Workflow of GazPNE is shown in the figure below.
 </p>
 
 
-Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the _model_ folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed. Our model was trained based on the OSM data in the US and India. Thus, it can  reconginze the place in the US and India.
+Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the <_model_> folder. The Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)) is also needed. Our model was trained based on the OSM data in the US and India. Thus, it can  reconginze the place in the US and India.
 
 ## 2.Model training
 The first step of GazPNE is to train a classification model based on positive examples from gazetteers and negative examples sythesized by rules.
 ### Training data perparation
-Several important data need to be prepared before generating the positive and negative examples. All data should be put in the _data_ folder.
+Several important data need to be prepared before generating the positive and negative examples. All data should be put in the <_data_> folder.
 
 **OpenStreetMap data**: Retrive OSM data in the US and India from ([OSMNames](https://osmnames.org/download/)), which are saved in us.tsv and india.tsv, respectively.
 
