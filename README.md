@@ -13,7 +13,7 @@ The first step of GazPNE is to train a classification model based on positive ex
 ### Training data perparation
 Several important data need to be prepared before generating the positive and negative examples. All data should be put in the ![data](data) folder.
 
-**OpenStreetMap data**: We extract place names in the entire US and India from OSMNames. The extracted data are saved in us.tsv and india.tsv, respectively.
+**OpenStreetMap data**: Retrive OSM data in the US and India from ([OSMNames](https://osmnames.org/download/)), which are saved in us.tsv and india.tsv, respectively.
 
 
 **Two word embeddings**: Google word embedding ([GoogleNews-vectors-negative300.bin](https://code.google.com/archive/p/word2vec/)) and Golve word embedding ([glove.6B.50d.txt](https://www.kaggle.com/watts2/glove6b50dtxt)).
@@ -24,9 +24,9 @@ After preparing the above data, [rawTextProcessing.py](rawTextProcessing.py) is 
  
 Parameter <*file*> denotes the ID of the generated files, saving positive and negative examples, named positive**ID**.txt and negative**ID**.txt
 
-We provide our extracted [positive](https://drive.google.com/file/d/1ewQH4__dpWV0sMumhf7VLVKCh3fAGSIN/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KMGy2W82S5GtuJ9ghoT51MP48Gu-sqCk/view?usp=sharing) examples, named positive216.txt and negative216.txt, respectively.
+We has also provided our extracted [positive](https://drive.google.com/file/d/1ewQH4__dpWV0sMumhf7VLVKCh3fAGSIN/view?usp=sharing) and [negative](https://drive.google.com/file/d/1KMGy2W82S5GtuJ9ghoT51MP48Gu-sqCk/view?usp=sharing) examples, named positive216.txt and negative216.txt, respectively.
 
-Next, the file for the negative examples is split into multiple smaller files with each containing at most 2 million lines (examples) to improve the efficiency of reading the negative examples.
+Next, the file saving the negative examples is split into multiple smaller files with each containing at most 2 million lines (examples) to improve the efficiency of loading the negative examples.
 
  > split -l 2000000 data/negative216.txt data/negative216
  
