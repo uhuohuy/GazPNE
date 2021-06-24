@@ -34,9 +34,10 @@ Next, the file saving the negative examples is split into multiple smaller files
 ### Train a C-LSTM model
 
 We apply the C-LSTM  model to classify the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
-
-<a href="url"><img src="figure/architecture.png" align="center" height="700" width="500" ></a>
-
+<p align="center">
+<a href="url">
+ <img src="figure/architecture.png" height="700" width="500" ></a>
+</p>
 [Gazetteer_weight.py](Gazetteer_weight.py) is used to train a model based on the positive and negative examples.
 
 python -u Gazetteer_weight.py --epoch 7 --train-batch-size 1000 --test-batch-size 1000 --split_l 10000000 --lstm_dim 120 --cnn_hid 120 --filter_l 1 --max_cache 10 --hc 1 --osm_word_emb 1 --positive 216 --negative 216 --osmembed 2 --preloadsize 3000000 --emb 1 --osm_word_emb 0 --max_len=20
