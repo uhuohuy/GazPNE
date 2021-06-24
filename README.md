@@ -7,7 +7,7 @@ The Workflow of GazPNE is shown in the figure below.
 
 <p align="center">
 <a href="url">
- <img src="figure/workflow.png" height="300" width="700" ></a>
+ <img src="figure/workflow.png"  ></a>
 </p>
 
 
