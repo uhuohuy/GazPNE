@@ -46,7 +46,7 @@ Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl'. 07082334
 
 ## 3.Place name tagging from tweet texts
 
-The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, Louisiana 2016, and Houston 2016 floods. The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) are provided and should be put in the ![data](data) folder. The trained model is then used to extract the place name from the tweet texts through [model_test_json.py](model_test_json.py).
+The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, Louisiana 2016, and Houston 2016 floods. The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) should be put under the ![data](data) folder. The trained model is then used to extract the place name from the tweets through [model_test.py](model_test.py).
 
 > python -u model_test.py --model_ID 0319140518  --epoch 11  --region 1 --thres 0.70
 
@@ -56,7 +56,7 @@ Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parame
 
 ![Screenshot](figure/result.png)
 
-Apart from the annotated gold data, we also apply our approach on the data set without annotation, corresponding to the 2018 Florance Hurricane. There are over 100,000 tweets. The tagging result by our approach is saved in [florence_result.txt](experiments/florence_result.txt).
+Apart from the annotated gold data, we also apply our approach to the data set without annotation, corresponding to the 2018 Florance Hurricane. There are over 100,000 tweets. The tagging result by our approach is saved in [florence_result.txt](experiments/florence_result.txt).
 
 ## 5. Citing
 If you do make use of GazPNE or any of its components please cite the following publication:
