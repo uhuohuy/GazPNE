@@ -72,6 +72,25 @@ If you do make use of GazPNE or any of its components please cite the following 
 
 > Xuke Hu, Hussein S. Al-Olimat, Jens Kersten, Matti Wiegmann, Friederike Klan, Yeran Sun & Hongchao Fan (2021) GazPNE: annotation-free deep learning for place name extraction from microblogs leveraging gazetteer and synthetic data by rules, International Journal of Geographical Information Science, DOI: 10.1080/13658816.2021.1947507
 
+@article{doi:10.1080/13658816.2021.1947507,
+author = {Xuke Hu and Hussein S. Al-Olimat and Jens Kersten and Matti Wiegmann and Friederike Klan and Yeran Sun and Hongchao Fan},
+title = {GazPNE: annotation-free deep learning for place name extraction from microblogs leveraging gazetteer and synthetic data by rules},
+journal = {International Journal of Geographical Information Science},
+volume = {0},
+number = {0},
+pages = {1-28},
+year  = {2021},
+publisher = {Taylor & Francis},
+doi = {10.1080/13658816.2021.1947507},
+
+URL = { 
+        https://doi.org/10.1080/13658816.2021.1947507
+    
+},
+eprint = { 
+        https://doi.org/10.1080/13658816.2021.1947507
+}
+}
 
 ## 6. Contact
 If you have any questions, feel free to contact Xuke Hu via xuke.hu@dlr.de
