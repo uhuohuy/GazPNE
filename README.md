@@ -70,7 +70,7 @@ Apart from the annotated gold data, we also apply our approach to the data set w
 ## 5. Citing
 If you do make use of GazPNE or any of its components please cite the following publication:
 
-Xuke Hu, Hussein S. Al-Olimat, Jens Kersten, Matti Wiegmann, Friederike Klan, Yeran Sun & Hongchao Fan (2021) GazPNE: annotation-free deep learning for place name extraction from microblogs leveraging gazetteer and synthetic data by rules, International Journal of Geographical Information Science, DOI: 10.1080/13658816.2021.1947507
+> Xuke Hu, Hussein S. Al-Olimat, Jens Kersten, Matti Wiegmann, Friederike Klan, Yeran Sun & Hongchao Fan (2021) GazPNE: annotation-free deep learning for place name extraction from microblogs leveraging gazetteer and synthetic data by rules, International Journal of Geographical Information Science, DOI: 10.1080/13658816.2021.1947507
 
 
 ## 6. Contact
