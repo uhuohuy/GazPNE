@@ -58,6 +58,8 @@ Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl'. 07082334
 ### Install python dependencies
 
 > pip install -r requirements.txt
+
+
 Python 3.7 is needed 
 
 
