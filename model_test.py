@@ -158,9 +158,9 @@ def load_word_index(index_file):
             if len(word) > max_char_len:
                 max_char_len = len(word)
             if len(line)== 1:
-                print('errors in vocab list')
-                print(line)
-                print(len(word2idx))
+                # print('errors in vocab list')
+                # print(line)
+                # print(len(word2idx))
                 word2idx['jiyougguexjcgsnoword'] = int(line[0])
             else:
                 if line[0] in word2idx.keys():
@@ -274,7 +274,7 @@ def main():
     if bool_mb_gaze:
         gazetteer_emb,gaz_emb_dim = load_embeding(gazetteer_emb_file)
     else:
-        gazetteer_emb = []
+        gazetteer_emb = {}
         gaz_emb_dim = 0
     char_hc_emb,_ = load_embeding(hcfeat_file)
     word_idx_file = 'model/'+args.model_ID+'-vocab.txt'    
@@ -293,8 +293,8 @@ def main():
         BertEmbed = BertEmbeds('data/uncased_vocab.txt', 'data/uncased_bert_vectors.txt')
         glove_emb, emb_dim = BertEmbed.load_bert_embedding()
     else:
-        glove_emb_file = 'data/glove.6B.50d.txt'
-        glove_emb, emb_dim = load_embeding(glove_emb_file)
+        glove_emb={}
+        emb_dim = 50
 
     weight_l = emb_dim+gaz_emb_dim+6
     weights_matrix = np.zeros((len(word2idx.keys()), weight_l))
@@ -397,7 +397,7 @@ def main():
                 for w in place:
                     ps += str(w) + ' '
                 ps += '\n'
-            save_file.write(ps)
+            #save_file.write(ps)
             pos_str = " ".join(str(item) for item in tag_lists)
             save_file.write(pos_str)
             save_file.write('\n')
@@ -487,7 +487,12 @@ def main():
                         detected_offsets.append(tuple([cur_off[sub_index[i][0]][0],cur_off[sub_index[i][-1]][1]]))
                         save_file.write(str(round(origin_pos_prob[i],3))+':'+str(all_sub_lists[i])+'\n')
             c_tp, c_fp,c_fn, place_detect_score = interset_num(detected_offsets,place_offset,detected_place_names,place_names)
-            save_file.write('tp:'+str(c_tp)+' c_fp:'+str(c_fp)+' c_fn:'+str(c_fn))
+            print('*'*50)
+            print(tweet)
+            print(detected_offsets)
+       	    print(detected_place_names)
+
+            #save_file.write('tp:'+str(c_tp)+' c_fp:'+str(c_fp)+' c_fn:'+str(c_fn))
             save_file.write('\n')
             for p, i in enumerate(place_names):
                 cur_len_p = 0

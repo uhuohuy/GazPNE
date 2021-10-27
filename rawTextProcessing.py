@@ -16,8 +16,6 @@ import inflect
 import string
 import argparse
 import time
-from memory_profiler import profile
-
 
 engine = inflect.engine()
 print(sys.getdefaultencoding())

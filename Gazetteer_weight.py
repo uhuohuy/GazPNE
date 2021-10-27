@@ -15,9 +15,6 @@ from Model import C_LSTM, CNN, BiLSTM
 import os
 import sys
 import torch.nn.functional as F
-import psutil
-from BertEmbeds import BertEmbeds
-from memory_profiler import profile
 import time
 import shutil
 
