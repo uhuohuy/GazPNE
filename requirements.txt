@@ -1,0 +1,7 @@
+gensim==3.8.0
+inflect==4.1.0
+numpy==1.17.2
+pyspellchecker==0.5.4
+spellchecker==0.4
+torch==1.4.0
+wordsegment==1.3.1
