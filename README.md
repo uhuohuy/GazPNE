@@ -55,11 +55,27 @@ Then, we can get a model named like 'clstm_model_0708233420epoch0.pkl'. 07082334
 
 ## 3.Place name tagging from tweet texts
 
+### Install python dependencies
+
+> pip install -r requirements.txt
+Python 3.7 is needed 
+
+
+
+### Run the code
+
+
 The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, Louisiana 2016, and Houston 2016 floods. The three annotated [tweet data sets](https://rebrand.ly/LocationsDataset) should be put under the _data_ folder. The trained model is then used to extract the place name from the tweets through [model_test.py](model_test.py).
+
 
 > python -u model_test.py --model_ID 0319140518  --epoch 11  --region 1 --thres 0.70
 
-Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parameter <*region*> denotes the test data set (Lousiana:0, Houston:1, Chennai:2). Parameter <*thres*> denotes the score threshold used to select the valid place name. 
+Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parameter <*region*> denotes the test data set (Lousiana:0, Houston:1, Chennai:2). Parameter <*thres*> denotes the score threshold used to select the valid place name.
+
+To execute below command in case of a jave error.  
+
+> spack load openjdk
+
 
 ## 4.Experimental results
 
