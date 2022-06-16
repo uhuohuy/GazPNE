@@ -72,7 +72,7 @@ The test dataset contains 4500 annotated tweets, corresponding to Chennai 2015, 
 
 Parameters <*model_ID*> and <*epoch*> determine which model will be used. Parameter <*region*> denotes the test data set (Lousiana:0, Houston:1, Chennai:2). Parameter <*thres*> denotes the score threshold used to select the valid place name.
 
-Execute below command in case of a jave error.  
+Execute the command below in case of a jave error.  
 
 > spack load openjdk
 
