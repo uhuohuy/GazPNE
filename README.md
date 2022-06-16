@@ -9,7 +9,7 @@ place names with abbreviations (e.g., ‘tx’ for ‘Texas’ and ‘studemont 
 </p>
 
 
-Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the _model_ folder. Our model was trained based on the OSM data in the US and India. Thus, it canreconginze the place in the US and India.
+Note that if you just want to use our trained model, you can skip the second step. Instead, you can download the [model data](https://drive.google.com/file/d/1j4CSF13Uoajcfh1h-yBuvVXo_-rub05o/view?usp=sharing) and unzip the data into the _model_ folder. Our model was trained based on the OSM data in the US and India. Thus, it can reconginze the place in the two regions.
 
 ## 2.Model training
 The first step of GazPNE is to train a classification model based on positive examples from gazetteers and negative examples sythesized by rules.
