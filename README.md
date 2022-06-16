@@ -27,7 +27,7 @@ After preparing the above data, [rawTextProcessing.py](rawTextProcessing.py) is 
  
 Parameter <*file*> denotes the ID of the generated files, saving positive and negative examples, named positive**ID**.txt and negative**ID**.txt
 
-We has also provided our extracted [positive](https://drive.google.com/file/d/1DZsclFIWxBS-MpBAfMDJvkfQLeUN9sre/view?usp=sharing) and [negative](https://drive.google.com/file/d/1E8ym0Bqd7LBcHvvgp2eXtiQz8yFJAWf2/view?usp=sharing) examples, named positive216.txt and negative216.txt, respectively.
+We have also provided our extracted [positive](https://drive.google.com/file/d/1DZsclFIWxBS-MpBAfMDJvkfQLeUN9sre/view?usp=sharing) and [negative](https://drive.google.com/file/d/1E8ym0Bqd7LBcHvvgp2eXtiQz8yFJAWf2/view?usp=sharing) examples, named positive216.txt and negative216.txt, respectively.
 
 Next, the file saving the negative examples is split into multiple smaller files with each containing at most 2 million lines (examples) to improve the efficiency of loading the negative examples.
 
@@ -35,7 +35,7 @@ Next, the file saving the negative examples is split into multiple smaller files
  
 ### Train a C-LSTM model
 
-We apply the C-LSTM model to classify the place entities, which combines the CNN and LSTM to achieve the best of both. The topology of the network is depicted as follows:
+We apply the C-LSTM model to classify the place entities, which combines the CNN and LSTM to achieve the best of both. The structure of the network is depicted as follows:
 <p align="center">
 <a href="url">
  <img src="figure/architecture.png" height="700" width="550" ></a>
