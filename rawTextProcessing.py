@@ -11,7 +11,7 @@ import collections
 from utility import write_place, hasNumbers
 from gensim.models import KeyedVectors
 from utility import load_osm_names, isascii, split_numbers, replace_digs,load_osm_names_fre
-from Garzetter_sim_pre import load_embeding
+from Gazetteer_weight import load_embeding
 import inflect
 import string
 import argparse
