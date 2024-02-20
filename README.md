@@ -83,11 +83,3 @@ Execute the command below in case of a jave error.
 
 Apart from the annotated gold data, we also apply our approach to the data set without annotation, corresponding to the 2018 Florance Hurricane. There are over 100,000 tweets. The tagging result by our approach is saved in [florence_result.txt](experiments/florence_result.txt).
 
-## 5. Citing
-If you do make use of GazPNE or any of its components please cite the following publication:
-
-> Xuke Hu, Hussein S. Al-Olimat, Jens Kersten, Matti Wiegmann, Friederike Klan, Yeran Sun & Hongchao Fan (2021) GazPNE: annotation-free deep learning for place name extraction from microblogs leveraging gazetteer and synthetic data by rules, International Journal of Geographical Information Science, DOI: 10.1080/13658816.2021.1947507
-
-
-## 6. Contact
-If you have any questions, feel free to contact Xuke Hu via xuke.hu@dlr.de
